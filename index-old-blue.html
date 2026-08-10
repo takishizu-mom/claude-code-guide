@@ -1,0 +1,1280 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>Claude Code 環境づくり 手順書</title>
+
+<style>
+  :root {
+    --paper: #F4F5F3;
+    --card: #FFFFFF;
+    --ink: #15171C;
+    --ink-2: #4A4F5A;
+    --ink-3: #7C828E;
+    --rule: #D9DCD8;
+    --rule-soft: #E7E9E5;
+    --spot: #2340C4;
+    --spot-soft: #E8EBFA;
+    --spot-ink: #1B32A0;
+    --warn: #A2521A;
+    --warn-soft: #F6EDE2;
+    --code-bg: #1A1D25;
+    --code-ink: #E4E6EA;
+    --code-rule: #2E3340;
+    --shadow: 0 1px 2px rgba(20,23,28,.05), 0 10px 28px -20px rgba(20,23,28,.3);
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --jp: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", "Yu Gothic", "Noto Sans JP", "Meiryo", system-ui, sans-serif;
+    --ease: cubic-bezier(.22,.75,.2,1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0F1116; --card: #171A21; --ink: #E9EBEF; --ink-2: #A8AEBB; --ink-3: #767D8C;
+      --rule: #2A2F3A; --rule-soft: #22262F; --spot: #8098FF; --spot-soft: #1B2140; --spot-ink: #A9BAFF;
+      --warn: #E0A76A; --warn-soft: #2A2118; --code-bg: #0A0C11; --code-ink: #DDE0E6; --code-rule: #262B36;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -22px rgba(0,0,0,.9);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0F1116; --card: #171A21; --ink: #E9EBEF; --ink-2: #A8AEBB; --ink-3: #767D8C;
+    --rule: #2A2F3A; --rule-soft: #22262F; --spot: #8098FF; --spot-soft: #1B2140; --spot-ink: #A9BAFF;
+    --warn: #E0A76A; --warn-soft: #2A2118; --code-bg: #0A0C11; --code-ink: #DDE0E6; --code-rule: #262B36;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -22px rgba(0,0,0,.9);
+  }
+  :root[data-theme="light"] {
+    --paper: #F4F5F3; --card: #FFFFFF; --ink: #15171C; --ink-2: #4A4F5A; --ink-3: #7C828E;
+    --rule: #D9DCD8; --rule-soft: #E7E9E5; --spot: #2340C4; --spot-soft: #E8EBFA; --spot-ink: #1B32A0;
+    --warn: #A2521A; --warn-soft: #F6EDE2; --code-bg: #1A1D25; --code-ink: #E4E6EA; --code-rule: #2E3340;
+    --shadow: 0 1px 2px rgba(20,23,28,.05), 0 10px 28px -20px rgba(20,23,28,.3);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--jp);
+    font-size: 16px;
+    line-height: 1.85;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 20px 80px; }
+
+  /* ---------- sticky progress ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--rule);
+    margin: 0 -20px 0;
+    padding: 0 20px;
+  }
+  .topbar-in {
+    max-width: 780px; margin: 0 auto;
+    display: flex; align-items: center; gap: 14px;
+    height: 52px;
+  }
+  .topbar .label {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
+    color: var(--ink-3); white-space: nowrap; font-weight: 700;
+  }
+  .track { flex: 1; height: 4px; background: var(--rule); border-radius: 2px; overflow: hidden; }
+  .track span {
+    display: block; height: 100%; width: 0%;
+    background: var(--spot); border-radius: 2px;
+    transition: width .5s var(--ease);
+  }
+  .count {
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    color: var(--spot); font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead { padding: 56px 0 36px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--spot); margin: 0 0 16px;
+  }
+  h1 {
+    font-size: clamp(27px, 5.6vw, 40px); line-height: 1.3; letter-spacing: -.02em;
+    font-weight: 800; margin: 0 0 16px; text-wrap: balance;
+  }
+  .standfirst { font-size: 16px; color: var(--ink-2); margin: 0 0 26px; }
+  .specs {
+    display: flex; flex-wrap: wrap;
+    border: 1px solid var(--rule); border-radius: 4px;
+    overflow: hidden; background: var(--card);
+  }
+  .spec { flex: 1 1 140px; padding: 12px 16px; border-right: 1px solid var(--rule-soft); }
+  .spec:last-child { border-right: 0; }
+  .spec dt {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--ink-3); margin: 0 0 2px;
+  }
+  .spec dd { margin: 0; font-size: 13.5px; font-weight: 700; line-height: 1.5; }
+
+  .howto {
+    margin: 28px 0 40px;
+    background: var(--spot-soft); border-left: 3px solid var(--spot);
+    border-radius: 0 4px 4px 0; padding: 20px 24px;
+  }
+  .howto h2 { margin: 0 0 12px; font-size: 14.5px; color: var(--spot-ink); }
+  .howto ol { margin: 0; padding: 0; list-style: none; counter-reset: ht; display: grid; gap: 5px; }
+  .howto li { counter-increment: ht; position: relative; padding-left: 30px; font-size: 14.5px; }
+  .howto li::before {
+    content: counter(ht); position: absolute; left: 0; top: .4em;
+    width: 19px; height: 19px; border-radius: 50%;
+    background: var(--spot); color: #fff;
+    font-family: var(--mono); font-size: 10.5px; line-height: 19px;
+    text-align: center; font-weight: 700;
+  }
+
+  /* ---------- accordion ---------- */
+  .steps { display: grid; gap: 10px; }
+
+  .step {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    scroll-margin-top: 62px;
+    transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
+  }
+  .step.open { border-color: color-mix(in srgb, var(--spot) 45%, var(--rule)); }
+
+  .step-head {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 46px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 18px 20px;
+    background: none;
+    border: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  .step-head:hover .st-title { color: var(--spot); }
+
+  .st-num {
+    font-family: var(--mono); font-size: 11.5px; font-weight: 700; letter-spacing: .06em;
+    color: #fff; background: var(--ink);
+    border-radius: 4px; padding: 5px 0; text-align: center;
+    transition: background .3s var(--ease);
+  }
+  .step.optional .st-num { background: var(--ink-3); }
+  .step.done .st-num { background: var(--spot); }
+
+  .st-title {
+    font-size: 17px; font-weight: 800; line-height: 1.45;
+    letter-spacing: -.005em;
+    transition: color .2s var(--ease);
+  }
+  .st-title small {
+    display: block;
+    font-family: var(--mono); font-size: 10.5px; font-weight: 500;
+    letter-spacing: .08em; color: var(--ink-3); margin-top: 3px;
+  }
+  .step.done .st-title { color: var(--ink-3); }
+
+  .st-mark { display: flex; align-items: center; gap: 10px; }
+  .st-check {
+    width: 20px; height: 20px; flex: none;
+    opacity: 0; transform: scale(.6);
+    transition: opacity .3s var(--ease), transform .35s var(--ease);
+  }
+  .step.done .st-check { opacity: 1; transform: scale(1); }
+  .st-check circle { fill: var(--spot); }
+  .st-check path {
+    stroke: #fff; stroke-width: 2.2; fill: none;
+    stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 16; stroke-dashoffset: 16;
+    transition: stroke-dashoffset .4s var(--ease) .1s;
+  }
+  .step.done .st-check path { stroke-dashoffset: 0; }
+  .chev {
+    width: 12px; height: 12px; flex: none;
+    border-right: 2px solid var(--ink-3);
+    border-bottom: 2px solid var(--ink-3);
+    transform: rotate(45deg) translate(-2px,-2px);
+    transition: transform .32s var(--ease), border-color .2s;
+  }
+  .step.open .chev {
+    transform: rotate(-135deg) translate(-3px,-3px);
+    border-color: var(--spot);
+  }
+
+  .step-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .38s var(--ease);
+  }
+  .step.open .step-body { grid-template-rows: 1fr; }
+  .step-body > div { overflow: hidden; }
+  .body-in {
+    padding: 4px 24px 26px;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity .3s var(--ease) .08s, transform .3s var(--ease) .08s;
+  }
+  .step.open .body-in { opacity: 1; transform: none; }
+  @media (max-width: 560px) {
+    .step-head { padding: 16px; grid-template-columns: 42px 1fr auto; gap: 11px; }
+    .st-title { font-size: 15.5px; }
+    .body-in { padding: 4px 16px 22px; }
+  }
+
+  /* ---------- body content ---------- */
+  /* 図解 */
+  .figure {
+    margin: 0 0 18px;
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    background: var(--paper);
+    padding: 14px 16px 10px;
+  }
+  .figure svg { display: block; width: 100%; height: auto; }
+  .figure figcaption {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
+    color: var(--ink-3); text-align: center; margin-top: 8px;
+  }
+  .fig-win { fill: var(--card); stroke: var(--rule); stroke-width: 1.5; }
+  .fig-bar { fill: var(--rule-soft); }
+  .fig-tab { fill: none; }
+  .fig-tab-on { fill: var(--spot); }
+  .fig-txt { fill: var(--ink-2); font-family: var(--jp); font-size: 14px; font-weight: 700; }
+  .fig-txt-on { fill: #fff; font-family: var(--jp); font-size: 14px; font-weight: 800; }
+  .fig-note { fill: var(--spot); font-family: var(--jp); font-size: 13.5px; font-weight: 800; }
+  .fig-dim { fill: var(--ink-3); font-family: var(--jp); font-size: 12.5px; }
+  .fig-arrow { stroke: var(--spot); stroke-width: 2; fill: none; stroke-linecap: round; }
+  .fig-chip { fill: var(--card); stroke: var(--rule); stroke-width: 1.5; }
+  .fig-chip-on { fill: var(--spot-soft); stroke: var(--spot); stroke-width: 2; }
+  .fig-btn { fill: var(--spot); }
+
+  /* このSTEPですること */
+  .todo {
+    display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start;
+    background: var(--paper); border: 1px solid var(--rule);
+    border-radius: 5px; padding: 13px 16px; margin: 0 0 20px;
+  }
+  .todo b {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--ink-3); font-weight: 700;
+    white-space: nowrap; padding-top: 3px;
+  }
+  .todo p { margin: 0; font-size: 14.5px; font-weight: 700; }
+
+  .lede { font-size: 15.5px; color: var(--ink-2); margin: 0 0 20px; }
+  .lede strong, p strong { color: var(--ink); }
+
+  h3 {
+    font-size: 14.5px; font-weight: 800; margin: 26px 0 11px;
+    padding-left: 11px; border-left: 3px solid var(--spot); line-height: 1.5;
+  }
+  h3:first-child { margin-top: 0; }
+  p { margin: 0 0 13px; }
+  a { color: var(--spot); text-underline-offset: 3px; }
+
+  ul.plain { margin: 0 0 16px; padding-left: 19px; }
+  ul.plain li { margin-bottom: 5px; }
+
+  ol.numbered { margin: 0 0 16px; padding: 0; list-style: none; counter-reset: ni; }
+  ol.numbered li {
+    counter-increment: ni; position: relative; padding-left: 27px; margin-bottom: 7px;
+  }
+  ol.numbered li::before {
+    content: counter(ni) "."; position: absolute; left: 0; top: .28em;
+    font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--spot);
+  }
+
+  .term {
+    background: var(--paper); border: 1px dashed var(--rule); border-radius: 4px;
+    padding: 13px 17px; margin: 0 0 18px; font-size: 14px; color: var(--ink-2);
+  }
+  .term b {
+    display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--ink-3); margin-bottom: 4px; font-weight: 700;
+  }
+  .term p { margin: 0 0 4px; }
+  .term p:last-child { margin-bottom: 0; }
+  .term code, p code, li code, td code {
+    font-family: var(--mono); font-size: 12.5px;
+    background: var(--spot-soft); color: var(--spot-ink);
+    padding: 1px 6px; border-radius: 3px; font-weight: 700;
+  }
+
+  /* ---------- paste block ---------- */
+  .paste {
+    margin: 0 0 20px; border-radius: 5px; overflow: hidden;
+    border: 1px solid var(--code-rule); background: var(--code-bg);
+  }
+  .paste-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 9px 11px 9px 14px;
+    background: rgba(255,255,255,.05);
+    border-bottom: 1px solid var(--code-rule);
+  }
+  .paste-label {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .15em;
+    text-transform: uppercase; color: #9BA3B4; font-weight: 700;
+  }
+  .copy-btn {
+    font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    color: #0F1116; background: #E4E6EA; border: 0; border-radius: 4px;
+    padding: 6px 13px; cursor: pointer;
+    transition: background .15s, color .15s, transform .15s var(--ease);
+  }
+  .copy-btn:hover { background: #fff; transform: translateY(-1px); }
+  .copy-btn:active { transform: translateY(0); }
+  .copy-btn.copied { background: var(--spot); color: #fff; }
+  .paste pre {
+    margin: 0; padding: 16px 18px; overflow: auto; cursor: text;
+    color: var(--code-ink); font-family: var(--mono);
+    font-size: 12.5px; line-height: 1.75;
+    white-space: pre-wrap; word-break: break-word;
+    max-height: 300px;
+  }
+  .paste-foot {
+    padding: 8px 14px; border-top: 1px solid var(--code-rule);
+    font-family: var(--mono); font-size: 10.5px; color: #767D8C; letter-spacing: .05em;
+  }
+
+  .confirm, .warnbox { border-radius: 4px; padding: 14px 18px; margin: 0 0 18px; font-size: 14.5px; }
+  .confirm { background: var(--spot-soft); border-left: 3px solid var(--spot); }
+  .warnbox { background: var(--warn-soft); border-left: 3px solid var(--warn); }
+  .confirm b, .warnbox b {
+    display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .16em;
+    text-transform: uppercase; margin-bottom: 5px; font-weight: 700;
+  }
+  .confirm b { color: var(--spot-ink); }
+  .warnbox b { color: var(--warn); }
+  .confirm p, .warnbox p { margin: 0; }
+
+  .tablewrap { overflow-x: auto; margin: 0 0 20px; }
+  table { border-collapse: collapse; width: 100%; min-width: 440px; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 13px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+  thead th {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--ink-3); border-bottom: 1px solid var(--rule); font-weight: 700; white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  .mini-copy {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .06em; font-weight: 700;
+    color: var(--spot); background: transparent; border: 1px solid var(--rule);
+    border-radius: 4px; padding: 4px 9px; cursor: pointer; white-space: nowrap;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .mini-copy:hover { border-color: var(--spot); }
+  .mini-copy.copied { background: var(--spot); color: #fff; border-color: var(--spot); }
+
+  /* ---------- next button ---------- */
+  .stepfoot {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--rule-soft);
+  }
+  .next-btn {
+    font-family: inherit; font-size: 14.5px; font-weight: 800;
+    color: #fff; background: var(--spot); border: 0; border-radius: 6px;
+    padding: 12px 22px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 9px;
+    transition: transform .18s var(--ease), filter .18s;
+  }
+  .next-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .next-btn:active { transform: translateY(0); }
+  .next-btn .arw { transition: transform .25s var(--ease); }
+  .next-btn:hover .arw { transform: translateX(3px); }
+  .undo-btn {
+    font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .05em;
+    background: transparent; border: 1px solid var(--rule); color: var(--ink-3);
+    border-radius: 6px; padding: 10px 14px; cursor: pointer;
+  }
+  .undo-btn:hover { border-color: var(--ink-3); color: var(--ink); }
+
+  /* ---------- closing ---------- */
+  .closing { margin-top: 48px; border-top: 2px solid var(--ink); padding-top: 36px; }
+  .thesis {
+    font-size: clamp(19px, 4.2vw, 25px); font-weight: 800; line-height: 1.55;
+    letter-spacing: -.01em; margin: 0 0 26px; max-width: 22ch; text-wrap: balance;
+  }
+  .thesis em { font-style: normal; color: var(--spot); }
+  .recap { border-top: 1px solid var(--rule); }
+  .recap div {
+    display: grid; grid-template-columns: 72px 1fr; gap: 14px;
+    padding: 12px 0; border-bottom: 1px solid var(--rule-soft);
+    font-size: 14px; align-items: baseline;
+  }
+  .recap span {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
+    color: var(--spot); font-weight: 700;
+  }
+  .colophon { margin-top: 30px; font-size: 12.5px; color: var(--ink-3); line-height: 1.8; }
+
+  :focus-visible { outline: 2px solid var(--spot); outline-offset: 2px; border-radius: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  }
+</style>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <span class="label">進捗</span>
+    <span class="track"><span id="pbar"></span></span>
+    <span class="count" id="pcount">0 / 8</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Setup Guide / Windows</p>
+    <h1>Claude Code を<br>「自分専用の開発チーム」にする手順書</h1>
+    <p class="standfirst">上から順にコピペしていくだけで完成します。プログラミングの知識は要りません。</p>
+    <dl class="specs">
+      <div class="spec"><dt>対象</dt><dd>Windows・非エンジニア</dd></div>
+      <div class="spec"><dt>所要時間</dt><dd>基本セット 約90分</dd></div>
+      <div class="spec"><dt>完成地点</dt><dd>STEP 5（6は任意）</dd></div>
+      <div class="spec"><dt>必要なもの</dt><dd>Claude Pro 以上</dd></div>
+      <div class="spec"><dt>作成</dt><dd>eri</dd></div>
+    </dl>
+
+    <div class="howto">
+      <h2>使い方</h2>
+      <ol>
+        <li>見出しを押すと、そのステップだけ開きます</li>
+        <li>各ステップは「<strong>すること → 貼る → 確認</strong>」の順で並んでいます</li>
+        <li>黒い枠の「コピー」を押して、Claude Code に貼り付け</li>
+        <li>確認までできたら「完了！次へ」を押す。次が自動で開きます</li>
+      </ol>
+    </div>
+  </header>
+
+  <div class="steps">
+
+    <!-- STEP 0 -->
+    <section class="step" id="step0">
+      <button class="step-head" aria-expanded="false" aria-controls="b0">
+        <span class="st-num">00</span>
+        <span class="st-title">準備（インストール〜作業フォルダを開く）<small>約 25 分 ・ 貼り付け 1回</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b0"><div><div class="body-in">
+
+        <div class="todo"><b>すること</b><p>プランを契約 → アプリを入れる → Git を入れる → <strong>Code タブで作業フォルダを開く</strong></p></div>
+
+        <h3>0-1. 有料プランに入る</h3>
+        <p>Claude Code は<strong>無料プランでは使えません</strong>。Pro（月20ドル）以上が必要です。</p>
+        <ol class="numbered">
+          <li><a href="https://claude.ai/">claude.ai</a> を開く</li>
+          <li>画面のすみにある自分の名前（アカウント）をクリック</li>
+          <li>「プランをアップグレード」を選ぶ</li>
+        </ol>
+
+        <h3>0-2. Claude のアプリを入れる</h3>
+        <ol class="numbered">
+          <li><a href="https://claude.ai/api/desktop/win32/x64/setup/latest/redirect">Windows 版をダウンロード</a>（ARM の PC の人は <a href="https://claude.ai/api/desktop/win32/arm64/setup/latest/redirect">ARM64 版</a>）</li>
+          <li>ダウンロードしたファイルをダブルクリックしてインストール</li>
+          <li>スタートメニューから <strong>Claude</strong> を起動して、アカウントでログイン</li>
+        </ol>
+
+        <h3>0-3. Git for Windows を入れる（必須）</h3>
+        <p><a href="https://git-scm.com/downloads/win">git-scm.com/downloads/win</a> からダウンロードして、ずっと「Next」を押していけば完了です。</p>
+        <div class="warnbox">
+          <b>Attention</b>
+          <p><strong>Windows では Git が入っていないと、この先の作業そのものが動きません。</strong>「あとで」にせず、ここで入れてください。</p>
+        </div>
+        <div class="term">
+          <b>用語メモ</b>
+          <p><code>Git</code>＝本来はプログラムの変更履歴を管理する道具。Windows の Claude Code は内部でこれを使うので、無いと動きません。</p>
+        </div>
+
+        <h3>0-4. 「Code」タブを開いて、作業フォルダを選ぶ ← ここが一番つまずく</h3>
+        <p>Claude のアプリには <strong>Chat ／ Cowork ／ Code</strong> の3つのタブがあります。<strong>ファイルを作れるのは Code タブだけ</strong>です。いつものチャット画面（Chat）に貼っても何も起きません。</p>
+        <ol class="numbered">
+          <li>アプリの<strong>画面いちばん上の中央</strong>にある <strong>「Code」</strong> をクリック<br><span style="color:var(--ink-3);font-size:14px">※「アップグレードして」と出たら、0-1 の契約がまだです</span></li>
+          <li>環境を選ぶところで <strong>「Local」</strong> をクリック（自分のパソコンの中で動かす、という意味）</li>
+          <li><strong>「Select folder」</strong> ボタンをクリック</li>
+          <li>デスクトップなどに <code>claude-練習</code> という<strong>新しいフォルダを作って</strong>、それを選ぶ</li>
+        </ol>
+
+        <figure class="figure">
+          <svg viewBox="0 0 560 132" role="img" aria-label="アプリ上部の Chat・Cowork・Code タブのうち、Code をクリックする図">
+            <rect class="fig-win" x="8" y="8" width="544" height="76" rx="9"/>
+            <rect class="fig-bar" x="9" y="9" width="542" height="1"/>
+            <rect class="fig-tab" x="176" y="28" width="76" height="34" rx="7"/>
+            <text class="fig-txt" x="214" y="51" text-anchor="middle">Chat</text>
+            <rect class="fig-tab" x="256" y="28" width="94" height="34" rx="7"/>
+            <text class="fig-txt" x="303" y="51" text-anchor="middle">Cowork</text>
+            <rect class="fig-tab-on" x="354" y="28" width="80" height="34" rx="7"/>
+            <text class="fig-txt-on" x="394" y="51" text-anchor="middle">Code</text>
+            <path class="fig-arrow" d="M394 104 L394 70"/>
+            <path class="fig-arrow" d="M387 78 L394 68 L401 78"/>
+            <text class="fig-note" x="394" y="122" text-anchor="middle">① ここをクリック</text>
+            <text class="fig-dim" x="24" y="51">アプリの上のほう</text>
+          </svg>
+          <figcaption>図1 ── ファイルを作れるのは Code タブだけ</figcaption>
+        </figure>
+
+        <figure class="figure">
+          <svg viewBox="0 0 560 186" role="img" aria-label="Local を選び、Select folder ボタンで作業フォルダを選ぶ図">
+            <rect class="fig-win" x="8" y="8" width="544" height="130" rx="9"/>
+            <text class="fig-dim" x="28" y="38">どこで動かす？</text>
+            <rect class="fig-chip-on" x="28" y="50" width="86" height="34" rx="7"/>
+            <text class="fig-txt" x="71" y="73" text-anchor="middle">Local</text>
+            <rect class="fig-chip" x="122" y="50" width="80" height="34" rx="7"/>
+            <text class="fig-dim" x="162" y="72" text-anchor="middle">Cloud</text>
+            <rect class="fig-chip" x="210" y="50" width="70" height="34" rx="7"/>
+            <text class="fig-dim" x="245" y="72" text-anchor="middle">SSH</text>
+            <path class="fig-arrow" d="M71 116 L71 90"/>
+            <path class="fig-arrow" d="M64 98 L71 88 L78 98"/>
+            <text class="fig-note" x="71" y="134" text-anchor="middle">② これを選ぶ</text>
+            <rect class="fig-btn" x="360" y="50" width="164" height="38" rx="8"/>
+            <text class="fig-txt-on" x="442" y="74" text-anchor="middle">Select folder</text>
+            <path class="fig-arrow" d="M442 120 L442 94"/>
+            <path class="fig-arrow" d="M435 102 L442 92 L449 102"/>
+            <text class="fig-note" x="442" y="138" text-anchor="middle">③ ここを押してフォルダを選ぶ</text>
+            <text class="fig-dim" x="28" y="172">※ ボタンの文字は英語のままです</text>
+          </svg>
+          <figcaption>図2 ── Local を選んでから、作業フォルダを指定する</figcaption>
+        </figure>
+        <div class="term">
+          <b>用語メモ</b>
+          <p><code>作業フォルダ</code>＝Claude が読み書きしていい場所。ここで選んだフォルダの外は勝手に触りません。最初は中身が空のフォルダで大丈夫です。</p>
+        </div>
+
+        <h3>0-5. 動くか確認する</h3>
+        <p>Code タブの下のほうにある入力欄に、下の枠を貼り付けてください。</p>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける</span><button class="copy-btn">コピー</button></div>
+          <pre>自己紹介と、今このパソコンで何ができるかを3行で教えてください。
+あと、いま開いている作業フォルダの場所と、
+私のホームフォルダの場所（C:\Users\〜）も教えてください。</pre>
+        </div>
+        <div class="confirm"><b>確認</b><p>返事の中に <strong>C:\Users\自分の名前</strong> のような場所が出てくれば成功です。出てこない・エラーが出る場合は、0-4 の「Code」タブに入れているか確認してください。</p></div>
+
+      </div></div></div>
+    </section>
+
+    <!-- STEP 1 -->
+    <section class="step" id="step1">
+      <button class="step-head" aria-expanded="false" aria-controls="b1">
+        <span class="st-num">01</span>
+        <span class="st-title">自分専用の取扱説明書をつくる<small>CLAUDE.md ／ 約 15 分 ・ 貼り付け 1回</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b1"><div><div class="body-in">
+
+        <div class="todo"><b>すること</b><p>質問に答えるだけ。Claude が自分用の取扱説明書を書いて保存します</p></div>
+
+        <p class="lede"><strong>ここが一番大事です。</strong>これを作らないと、AI は毎回あなたの好みを忘れます。逆にここさえ作れば、「私は非エンジニアです」「勝手に大改造しないで」を毎回言わなくて済みます。</p>
+        <div class="term">
+          <b>用語メモ</b>
+          <p><code>CLAUDE.md</code>＝AI が毎回いちばん最初に読む「あなたの取扱説明書」。新しい会話を始めても覚えていてくれます。</p>
+        </div>
+
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける</span><button class="copy-btn">コピー</button></div>
+          <pre>これから、私専用の CLAUDE.md（＝あなたが毎回最初に読む「私の取扱説明書」）を一緒に作ります。
+
+【あなたへのお願い】
+- 私は非エンジニアです。専門用語には必ず「（＝〇〇のこと）」と説明をつけてください。
+- 質問はまとめてではなく、1問ずつ聞いてください。私が答えたら次の質問へ進んでください。
+
+【聞いてほしいこと】
+1. 私が何者か（仕事・立場・パソコンの得意度）
+2. 何を作りたいか（アプリ／サイト／ゲーム／自動化など）
+3. 返事の言葉づかいの好み（日本語か英語か、結論を先に言ってほしいか、長さ）
+4. AIに絶対やってほしくないこと（例：頼んでいない機能を勝手に足す、など）
+5. 勝手にやらず必ず確認してほしい操作（例：ネットに公開する、データを消す、お金がからむ）
+
+【全部答え終わったら】
+私の答えをもとに CLAUDE.md を書いて、ホームフォルダの .claude フォルダの中に
+CLAUDE.md という名前で保存してください（例：C:\Users\自分の名前\.claude\CLAUDE.md）。
+保存できたら、書いた中身をそのまま画面に見せてください。
+
+なお、この取扱説明書には次の4つを必ず入れてください。
+・操作の説明は「どの画面の・どこにある・何と書いてあるボタンを・どうする」まで書く
+・頼んでいない大改造やリファクタ（＝コードの整理し直し）はしない
+・実際に動かして確認できたときだけ「できました」と言う。確認していないことは「未確認」と正直に言う
+・調べものは公式サイト・公式ドキュメント（＝一次情報）を優先する</pre>
+          <div class="paste-foot">Claude が1問ずつ質問してきます。思いつくままに答えて大丈夫です。</div>
+        </div>
+
+        <div class="confirm"><b>確認</b><p>Claude が <strong>書いた中身をそのまま画面に見せてくれる</strong>のが合格の合図です。読んでみて違うところがあれば「ここをこう直して」と言えば直してくれます。</p></div>
+
+      </div></div></div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="step" id="step2">
+      <button class="step-head" aria-expanded="false" aria-controls="b2">
+        <span class="st-num">02</span>
+        <span class="st-title">担当者を3人つくる<small>サブエージェント ／ 約 10 分 ・ 貼り付け 4回</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b2"><div><div class="body-in">
+
+        <div class="todo"><b>すること</b><p>黒い枠を <strong>1人ずつ・順番に</strong> 貼る（3回）→ 最後に動作テスト（1回）</p></div>
+
+        <p class="lede">AI 1体に全部やらせると、設計しながら実装して、<strong>自分で自分の仕事を採点する</strong>状態になります。役割を分けると精度が上がります。</p>
+        <div class="term">
+          <b>用語メモ</b>
+          <p><code>サブエージェント</code>＝本体の AI が呼び出せる「別の担当者 AI」。専門ごとに性格と権限を変えられます。</p>
+        </div>
+
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>担当</th><th>仕事</th><th>権限</th></tr></thead>
+            <tbody>
+              <tr><td><code>implementer</code></td><td>指示どおりにコードを書くだけ。設計判断はしない</td><td>書き換え可</td></tr>
+              <tr><td><code>investigator</code></td><td>原因や現状を調べて報告するだけ</td><td>読むだけ</td></tr>
+              <tr><td><code>reviewer</code></td><td>他の AI が書いたものを別の目でチェック</td><td>読むだけ</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>① 実装係（implementer）をつくる</h3>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける 1/4</span><button class="copy-btn">コピー</button></div>
+          <pre>サブエージェント（＝役割ごとの担当AI）を1体つくってください。
+ホームフォルダの .claude\agents\implementer.md に、下の内容をそのまま保存してください。
+（例：C:\Users\自分の名前\.claude\agents\implementer.md）
+保存できたら、ファイルができているか確認して報告してください。
+
+---
+name: implementer
+description: 承認済みの設計・指示書に基づく実装専任。コードの新規作成・修正・バグ修正用。設計が未確定のタスクには使わない。
+model: sonnet
+effort: high
+---
+
+あなたは実装専任のエンジニアです。設計判断はあなたの仕事ではありません。
+
+## 契約（違反はインシデント）
+1. 渡された設計・指示書から逸脱しない。途中で設計の不備・曖昧さ・矛盾を見つけたら、自分で判断せず作業を止めて呼び出し元に報告する。
+2. Surgical Changes：依頼と無関係の隣接コード（コメント・整形含む）は触らない。壊れていないコードはリファクタしない。
+3. パッケージ操作はそのプロジェクトで使われているものに合わせる（勝手に別のものを使わない）。
+4. バグの原因を特定したら、修正前に同じパターンを検索し、類似箇所も含めて報告する。
+
+## 完了報告（必ずこの4点形式）
+1. 何を変えたか：ファイルごとの変更内容
+2. 何を実行したか：実行したコマンド・操作
+3. 何が返ったか：実際の出力・結果（そのまま）
+4. 未検証は何か：動かして確認していない箇所を正直に列挙
+
+「検証済み」と自分で宣言しない。ビルドが通った・コードを読んだ＝検証ではない。</pre>
+        </div>
+
+        <h3>② 調査係（investigator）をつくる</h3>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける 2/4</span><button class="copy-btn">コピー</button></div>
+          <pre>もう1体つくってください。
+ホームフォルダの .claude\agents\investigator.md に、下の内容をそのまま保存してください。
+保存できたら、ファイルができているか確認して報告してください。
+
+---
+name: investigator
+description: 調査専任。コード・ログ・ファイルを読んで「どこが原因か／今どうなっているか」を突き止めて報告する。読み取り専用。
+model: sonnet
+effort: high
+tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
+---
+
+あなたは調査専任です。コードやファイルを一切変更しません（読み取り専用）。
+
+## 契約（違反はインシデント）
+1. ファイルの新規作成・編集・削除をしない。コマンドも読み取り確認だけに使い、状態を変える操作（インストール・設定変更・削除など）はしない。必要になったら実行せず「これが必要」と報告する。
+2. 推測と確認済みを必ず分ける。「確認できた事実」と「たぶんこうだと思う（未確認）」を混ぜない。
+3. 原因を1つ見つけても止まらず、同じパターンが他にないか探し、影響範囲を洗い出す。
+
+## 報告フォーマット（必ずこの形）
+1. 分かったこと（確認済みの事実）：ファイル名・場所つきで
+2. 原因の見立て：どこが・なぜ。確信度（確実／たぶん）も書く
+3. 類似・関連箇所：他に同じ問題がありそうな場所
+4. まだ分かっていないこと：未確認の点を正直に
+
+実際に読んだコードや出力をそのまま示す。自分で「解決した」とは言わない（あなたは直さない）。</pre>
+        </div>
+
+        <h3>③ レビュー係（reviewer）をつくる</h3>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける 3/4</span><button class="copy-btn">コピー</button></div>
+          <pre>最後にもう1体つくってください。
+ホームフォルダの .claude\agents\reviewer.md に、下の内容をそのまま保存してください。
+保存できたら、ファイルができているか確認して報告してください。
+
+---
+name: reviewer
+description: レビュー専任。他のAIが書いたコードを別の目で見て「頼んだとおりか／余計なことをしていないか／壊していないか／危なくないか」を確認して報告する。読み取り専用。
+model: sonnet
+effort: high
+tools: Read, Grep, Glob, Bash
+---
+
+あなたはレビュー専任です。コードを一切変更しません。問題を見つけて報告するのが仕事です。
+
+## 見るポイント
+1. 指示どおりか：頼まれた変更になっているか。過不足がないか。
+2. 余計なことをしていないか：無関係な箇所を書き換えていないか。頼んでいない機能が足されていないか。動いていたコードを壊していないか。
+3. 安全か：パスワードやAPIキーが直書きされていないか。データを消す・お金が動く危険な操作が紛れていないか。
+4. 確認されているか：「動かして確認した」と言える根拠があるか。
+
+## 契約
+- ファイルの作成・編集・削除をしない。
+- 「問題なし」と言うのは、実際に該当箇所を読んで確認できたときだけ。読んでいない部分は「未確認」と書く。
+
+## 報告フォーマット（必ずこの形）
+1. 総合判定：問題なし / 気になる点あり / 危険な点あり
+2. 良い点：指示どおりできている点
+3. 気になる点：場所となぜ気になるかをセットで
+4. 未確認：見きれていない部分</pre>
+        </div>
+
+        <h3>④ 3人ちゃんといるかテストする</h3>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける 4/4</span><button class="copy-btn">コピー</button></div>
+          <pre>.claude\agents\ の中にあるファイルを一覧で見せてください。
+そのあと investigator（調査係）を実際に呼び出して、
+私の .claude フォルダの中に今どんなファイルがあるか調べて報告させてください。</pre>
+        </div>
+
+        <div class="confirm">
+          <b>確認</b>
+          <p>次の2つが両方そろえば合格です。<br>
+          ① 一覧に <code>implementer.md</code> <code>investigator.md</code> <code>reviewer.md</code> の<strong>3つ</strong>が出る<br>
+          ② 調査係が実際に動いて、フォルダの中身を報告してくる<br>
+          足りない担当者がいたら、その人の枠だけもう一度貼り直せば OK です。</p>
+        </div>
+
+      </div></div></div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="step" id="step3">
+      <button class="step-head" aria-expanded="false" aria-controls="b3">
+        <span class="st-num">03</span>
+        <span class="st-title">安全装置をつける<small>フック ／ 約 25 分 ・ 貼り付け 2回（＋万一の戻し1回）</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b3"><div><div class="body-in">
+
+        <div class="todo"><b>すること</b><p>安全装置をつくらせる（1回）→ <strong>4項目のテスト表で自分で合否を見る</strong>（1回）</p></div>
+
+        <p class="lede">STEP 2 で担当者を作っても、<strong>AI は面倒になると自分で全部やってしまいます。</strong>それを「お願い」ではなく「仕組み」で止めるのが、この STEP です。</p>
+
+        <div class="warnbox">
+          <b>Attention</b>
+          <p>ここは Claude Code の<strong>設定ファイルを書き換える</strong>ステップです。うまくいかなくても、この STEP の一番下にある「<strong>元に戻す</strong>」枠を貼れば元通りになります。先にそこがあることだけ覚えておいてください。</p>
+        </div>
+        <div class="term">
+          <b>用語メモ</b>
+          <p><code>フック</code>＝AI が何か操作をする直前に自動で走る「見張り番プログラム」。ルール違反なら操作そのものをブロックできます。お願いではなく強制なので、確実に効きます。</p>
+        </div>
+
+        <ul class="plain">
+          <li><strong>① 直接実装ブロック</strong> — 高性能モデル（Opus）で会話しているときは、本体がコードを直接書けなくなる</li>
+          <li><strong>② 承認ゲート</strong> — implementer を動かす前に、あなたの「実装して」という承認を必ず挟む</li>
+        </ul>
+
+        <h3>① 安全装置をつくらせる</h3>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける 1/2</span><button class="copy-btn">コピー</button></div>
+          <pre>Claude Code のフック（＝操作の直前に自動で走る見張り番）を設定してください。
+私のパソコンは Windows です。Git for Windows は入れてあります。
+
+【つくってほしい仕組み】
+A. 本体セッションのモデルが opus のとき、Edit と Write（＝ファイルの作成・編集）をブロックする。
+   ただし次は例外として許可する：
+   - .md / .txt などの文書ファイル
+   - .claude フォルダの中のファイル
+   - 一時フォルダの中のファイル
+   ブロックするときは「設計モデルでの直接実装は分業ルール違反です。実行指示書(.md)を書いて
+   implementer に委任してください」という理由を表示する。
+
+B. サブエージェント implementer を起動しようとしたとき、承認フラグのファイルが無ければブロックする。
+   承認フラグは .claude\hooks\state\implementer-ok という空ファイルで、1回使ったら消える（使い切り）。
+   ブロック時の理由は「implementer への委任には承認が必要です。実行指示書(.md)を見せて一旦停止し、
+   『実装して』の承認をもらってから承認フラグを作ってください」と表示する。
+
+C. 逃し道も用意する。どうしても自分で直接書きたい日は
+   .claude\hooks\state\model-roles-off というファイルに今日の日付を書けば、その日だけ A を無効化する。
+
+【つくり方の条件（重要）】
+- Windows で確実に動く形にしてください。jq のような追加ツールが入っていない前提で書いてください。
+- スクリプトは PowerShell（.ps1）でも Git Bash（.sh）でも構いません。あなたが確実に動かせる方を選んでください。
+- 設定は ~/.claude/settings.json の hooks に PreToolUse として登録してください
+  （matcher は Edit|Write と Task|Agent）。
+- ブロックするときの返し方は、公式ドキュメントの形式に従ってください
+  （hookSpecificOutput の permissionDecision を deny にする形）。
+  形式に自信がない場合は https://code.claude.com/docs/en/hooks を読んでから書いてください。
+- settings.json を書き換える前に、必ず settings.json.bak という名前でバックアップを取ってください。
+  取ったら、そのバックアップの置き場所（フルパス）を私に見せてください。
+
+【最後に必ず】
+作ったら、実際にブロックが効くかテストして、その結果を私に見せてください。
+テストしていない状態で「できました」と言わないでください。</pre>
+          <div class="paste-foot">終わったら、バックアップの置き場所をメモしておいてください。</div>
+        </div>
+
+        <h3>② 効いているか、4項目でテストする</h3>
+        <p>AI の「できました」を信じずに、<strong>自分で表を見て judge します</strong>。次の枠を貼ってください。</p>
+
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける 2/2</span><button class="copy-btn">コピー</button></div>
+          <pre>いま作った安全装置が本当に効いているか、次の4件をこの順で実際に試して、
+結果を表（項目／期待どおりか ◯✗／実際に何が起きたか）で見せてください。
+推測で埋めず、実際に試した結果だけを書いてください。
+
+1. 文書ファイルの作成：テスト用の test.md を作る
+   → 期待：ブロックされず、普通に作れる
+
+2. コードファイルの編集：テスト用の test.js を作ろうとする
+   → 期待：ブロックされて「実行指示書を書いて implementer に委任してください」と出る
+
+3. 承認なしの委任：承認フラグを作らずに implementer を呼ぼうとする
+   → 期待：ブロックされて「承認が必要です」と出る
+
+4. 承認ありの委任：承認フラグを作ってから implementer を呼ぶ
+   → 期待：1回だけ通り、そのあとフラグが消えている
+
+最後に、テストで作ったファイル（test.md / test.js）は削除してください。
+4件のうち1件でも期待どおりでなければ、「未達成」とはっきり書いてください。</pre>
+        </div>
+
+        <div class="confirm">
+          <b>確認</b>
+          <p><strong>4件すべてが ◯ になったときだけ</strong>、このステップは合格です。1件でも ✗ なら、その番号を伝えて「◯番が期待どおりになっていません。原因を調べて直してください」と言ってください。</p>
+        </div>
+
+        <h3>うまくいかないとき：元に戻す</h3>
+        <p>設定がおかしくなって前に進めなくなったら、これを貼れば安全装置を外して元の状態に戻せます。</p>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">困ったときだけ</span><button class="copy-btn">コピー</button></div>
+          <pre>さっき入れた安全装置（フック）が原因で作業が進まなくなりました。元に戻してください。
+
+1. ~/.claude/settings.json を、バックアップ（settings.json.bak）の内容で上書きしてください。
+   バックアップが見つからない場合は、settings.json の "hooks" の部分だけを削除してください。
+2. .claude\hooks\ に作ったスクリプトファイルは、消さずに残しておいてください
+   （あとでやり直せるように）。
+3. 元に戻せたか確認して、いま settings.json がどうなっているか見せてください。</pre>
+        </div>
+
+      </div></div></div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section class="step" id="step4">
+      <button class="step-head" aria-expanded="false" aria-controls="b4">
+        <span class="st-num">04</span>
+        <span class="st-title">自分専用コマンドをつくる<small>スキル ／ 約 10 分 ・ 貼り付け 1回</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b4"><div><div class="body-in">
+
+        <div class="todo"><b>すること</b><p>黒い枠を1回貼るだけ。よく使う4つのコマンドが一度に作られます</p></div>
+
+        <p class="lede"><code>/</code> から始まる自分だけのコマンドを作れます。よく使う手順を、毎回説明せずに済みます。</p>
+        <div class="term">
+          <b>用語メモ</b>
+          <p><code>スキル（スラッシュコマンド）</code>＝「この合言葉を言われたら、この手順でやってね」を登録しておく仕組み。</p>
+        </div>
+
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>コマンド</th><th>いつ使う</th><th>何が起きる</th></tr></thead>
+            <tbody>
+              <tr><td><code>/バグ調査</code></td><td>「動かない」とき</td><td>勝手に直さず、再現 → 原因特定 → 報告してから承認を待つ</td></tr>
+              <tr><td><code>/報告</code></td><td>作業が一区切り</td><td>非エンジニアにも分かる言葉で結果をまとめる</td></tr>
+              <tr><td><code>/公開前チェック</code></td><td>公開・削除の前</td><td>決まった安全確認を通す</td></tr>
+              <tr><td><code>/記録</code></td><td>終わりぎわ</td><td>やったこと・決めたこと・次にやることを残す</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける</span><button class="copy-btn">コピー</button></div>
+          <pre>私専用のスキル（＝/ から始まる自分だけのコマンド）を4つ作ってください。
+ホームフォルダの .claude\skills\ の中に、コマンド名のフォルダを作り、
+その中に SKILL.md を置く形でお願いします。
+（例：C:\Users\自分の名前\.claude\skills\bug-investigation\SKILL.md）
+
+1. bug-investigation（合言葉：/バグ調査、または私が「動かない」「エラーが出る」と言ったとき）
+   → 勝手に直さない。①エラーを再現する ②原因を特定する ③同じパターンが他にないか探す
+     ④ここまでを報告して私の承認を待つ。承認後に初めて修正する。
+
+2. clear-report（合言葉：/報告、作業が一区切りしたとき）
+   → 非エンジニアの私にも分かる言葉で報告する。結論を先に書く。専門用語には説明をつける。
+     「何を変えたか／何を実行したか／何が返ったか／未検証は何か」の4点で書く。
+
+3. pre-release-check（合言葉：/公開前チェック、私が「公開したい」「アップしたい」と言ったとき）
+   → 外に出す・戻せない操作の前に、決まった安全確認をする。
+     パスワードやAPIキーが混ざっていないか／消えて困るデータに触っていないか／
+     実際に動かして確認できているか。確認できたものだけチェックを付け、
+     未確認は未確認と表示して、私の最終OKを待つ。
+
+4. session-log（合言葉：/記録、セッションの終わり）
+   → このセッションでやったこと・決めたこと（と理由）・未解決／次にやること の3点をまとめて、
+     ファイルに保存する。長い経緯は書かない。保存先は後で Notion に変更する予定なので、
+     いまは分かりやすい場所（例：ホームフォルダの logs フォルダ）に日付名で保存してください。
+
+各 SKILL.md の先頭には name と description を書いてください。
+4つできたら、一覧と使い方を教えてください。</pre>
+        </div>
+
+        <div class="confirm"><b>確認</b><p>入力欄に <code>/</code> と1文字打ってください。候補の一覧に <code>bug-investigation</code> <code>clear-report</code> <code>pre-release-check</code> <code>session-log</code> の<strong>4つ</strong>が出れば合格です。</p></div>
+
+      </div></div></div>
+    </section>
+
+    <!-- STEP 5 -->
+    <section class="step" id="step5">
+      <button class="step-head" aria-expanded="false" aria-controls="b5">
+        <span class="st-num">05</span>
+        <span class="st-title">記録を Notion に残す<small>連携 ／ 約 20 分 ・ Notion側の準備あり ・ 貼り付け 2回</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b5"><div><div class="body-in">
+
+        <div class="todo"><b>すること</b><p>Notion のアカウントとページを作る（手作業）→ Claude とつなぐ → 保存先を切り替える</p></div>
+
+        <p class="lede">記録が手元のファイルだけだと、あとで探せません。Notion に自動で残るようにします。<strong>この STEP だけ手作業が多め</strong>です。時間に余裕があるときにどうぞ。</p>
+        <div class="term">
+          <b>用語メモ</b>
+          <p><code>MCP</code>＝Claude が外部サービス（Notion・GitHub など）と直接やりとりするための接続口。</p>
+          <p><code>OAuth</code>＝パスワードを渡さずに「このアプリに許可します」とボタンひとつで連携する方式。</p>
+        </div>
+
+        <h3>5-1. Notion 側の準備（手で行う）</h3>
+        <ol class="numbered">
+          <li><a href="https://www.notion.so/">notion.so</a> でアカウントを作る（無料で OK）</li>
+          <li>左サイドバーの下のほうにある「＋ ページを追加」をクリック</li>
+          <li>タイトルに <code>Claude ワークスペース</code> と入力</li>
+          <li>そのページの本文で <code>/page</code> と打って、子ページを4つ作る ——<br><code>作業ログ</code> ／ <code>要件定義</code> ／ <code>指示書</code> ／ <code>学び</code></li>
+        </ol>
+
+        <h3>5-2. Claude と Notion をつなぐ</h3>
+        <p>Claude Code の入力欄の左にある <strong>＋ ボタン</strong>から接続します。</p>
+        <ol class="numbered">
+          <li>Code タブの<strong>入力欄のすぐ横にある「＋」</strong>をクリック</li>
+          <li>出てきた一覧から <strong>「Connectors」</strong>（または「MCP」）を選ぶ</li>
+          <li>一覧の中の <strong>Notion</strong> を探して、追加する</li>
+          <li>ブラウザが開いて Notion のログイン画面が出るので、ログインして <strong>「アクセスを許可する」</strong> を押す</li>
+          <li>Claude の画面に戻り、入力欄に <code>/mcp</code> と打って、Notion が <strong>connected（接続済み）</strong>になっているか確認する</li>
+        </ol>
+        <div class="warnbox">
+          <b>Attention</b>
+          <p>画面の作りが違って見つからないときだけ、下の枠を貼って道案内してもらってください。</p>
+        </div>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">見つからないときだけ</span><button class="copy-btn">コピー</button></div>
+          <pre>Claude Code に Notion を接続したいです。
+私の環境（Windows・デスクトップアプリ）で、どの画面のどこをクリックすればいいか、
+「① 〜をクリック ② 〜を選ぶ」の形で、省略せずに手順を教えてください。
+接続できたかを確認する方法も教えてください。</pre>
+        </div>
+
+        <h3>5-3. 記録先を Notion に切り替える</h3>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける</span><button class="copy-btn">コピー</button></div>
+          <pre>Notion に接続できました。
+STEP 4 で作った session-log スキルの保存先を、ローカルのファイルから Notion に変更してください。
+
+- 保存先：Notion の「Claude ワークスペース」→「作業ログ」ページの子ページとして新規作成
+- ページタイトル：YYYY-MM-DD_プロジェクト名_内容
+- 中身は3点だけ：## やったこと ／ ## 決めたこと（と理由）／ ## 未解決・次にやること
+
+書き換えたら、実際にテスト用のログを1件保存してみて、Notion に出来ているか確認して、
+そのページのリンクを見せてください。</pre>
+        </div>
+
+        <div class="confirm"><b>確認</b><p>Notion を開いて、「Claude ワークスペース」→「作業ログ」の中に<strong>テストページが実際にできている</strong>ことを、自分の目で見てください。Claude が「保存しました」と言っても、ページが無ければ未完了です。</p></div>
+
+        <div class="confirm" style="border-left-color:var(--warn);background:var(--warn-soft)"><b style="color:var(--warn)">ここで基本セット完成</b><p>おつかれさまでした。STEP 6 は無くても困りません。<strong>ここで終わりにして大丈夫です。</strong></p></div>
+
+      </div></div></div>
+    </section>
+
+    <!-- STEP 6 -->
+    <section class="step optional" id="step6">
+      <button class="step-head" aria-expanded="false" aria-controls="b6">
+        <span class="st-num">06</span>
+        <span class="st-title">さらに強くする<small>任意 ／ 進捗には数えません</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b6"><div><div class="body-in">
+
+        <p class="lede">ここから先は無くても困りません。<strong>STEP 5 まででいったん完成</strong>です。</p>
+
+        <h3>6-A. AI 二刀流（Claude と ChatGPT に議論させる）</h3>
+        <p>正解のないテーマを、別の AI とぶつけて多角的に検討させる仕組みです。ChatGPT Plus 以上の契約が必要です。</p>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける</span><button class="copy-btn">コピー</button></div>
+          <pre>Claude Code から Codex（＝OpenAI のコマンド版 ChatGPT）を呼び出せるようにしたいです。
+私は Windows・非エンジニアです。次の順で、省略せずに案内してください。
+
+① Codex CLI をインストールする手順（どの画面で何を打つか）
+② ChatGPT アカウントでログインする手順
+③ インストールできたか確認するコマンドと、その結果の見方
+
+そのあと、私専用のスキルを2つ作ってください。
+- /議論 … 企画や方針など正解のないテーマについて、Codex に反論と対案を出させて、
+  両者の意見をまとめて報告する。往復は最大1回まで。
+- /別視点レビュー … 書いたコードを Codex にも読ませて、Claude が見落とした点を指摘させる。
+
+【安全のための条件】
+- Codex への指示は、コマンドに直接書かず、いったんファイルに書いてから渡してください（誤動作防止のため）。
+- Codex には読み取り専用で実行させてください（勝手に書き換えさせない）。
+- Codex が呼び出せなかったときは、正直に「呼べませんでした」と報告して止まってください。
+  自分だけの意見を「2体で議論した結果」と言わないでください。</pre>
+        </div>
+
+        <h3>6-B. ブラウザ操作（Claude in Chrome）</h3>
+        <p>Claude が Chrome を見て操作できるようになります。作ったサイトの表示確認などに便利です。</p>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける</span><button class="copy-btn">コピー</button></div>
+          <pre>Claude in Chrome（＝ClaudeがChromeを見て操作できる拡張機能）を使いたいです。
+私は Windows・非エンジニアです。インストールから使えるようになるまでを、
+「① どの画面の ② どこにある ③ 何と書いてあるボタンを ④ どうする」の形で、省略せずに教えてください。
+使えるようになったか確認する方法も教えてください。</pre>
+        </div>
+
+      </div></div></div>
+    </section>
+
+    <!-- FINAL -->
+    <section class="step" id="final">
+      <button class="step-head" aria-expanded="false" aria-controls="b7">
+        <span class="st-num">✔</span>
+        <span class="st-title">できているか点検する<small>最後に1回 ・ 貼り付け 1回</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b7"><div><div class="body-in">
+
+        <div class="todo"><b>すること</b><p>黒い枠を1回貼って、出てきた表に ✗ が無いか見るだけ</p></div>
+
+        <p class="lede">これを貼ると、Claude が全部まとめて点検して表で見せてくれます。</p>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける</span><button class="copy-btn">コピー</button></div>
+          <pre>私の Claude Code のセットアップが正しくできているか点検して、表で見せてください。
+
+チェック項目
+1. CLAUDE.md（取扱説明書）はあるか。中身は何行か
+2. サブエージェントは何体いるか。名前は
+3. フック（安全装置）は設定されているか。実際に効くか試して結果を見せる
+4. スキル（/コマンド）はいくつあるか。名前は
+5. Notion は接続されているか
+
+各項目は「◯できている／△未確認／✗できていない」で判定してください。
+実際に確認していない項目を「◯」にしないでください。
+できていない項目があれば、直す手順を1つずつ教えてください。</pre>
+        </div>
+
+        <h3>困ったときの一言集</h3>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>こんなとき</th><th>言う言葉</th><th></th></tr></thead>
+            <tbody>
+              <tr><td>説明が難しい</td><td data-phrase>いまの説明を、パソコンが苦手な人にも分かる言葉で言い直してください。専門用語には「（＝〇〇のこと）」を付けてください。</td><td><button class="mini-copy">コピー</button></td></tr>
+              <tr><td>どこを触るか分からない</td><td data-phrase>どの画面の・どこにある・何と書いてあるボタンを・どうするのか、①②③の順で省略せずに教えてください。</td><td><button class="mini-copy">コピー</button></td></tr>
+              <tr><td>勝手に大改造された</td><td data-phrase>頼んでいない変更が入っています。今回の依頼と無関係な変更を全部元に戻して、変更点の一覧を見せてください。</td><td><button class="mini-copy">コピー</button></td></tr>
+              <tr><td>本当に動くのか不安</td><td data-phrase>それは実際に動かして確認しましたか？確認していないなら「未確認」と正直に言って、確認する方法を教えてください。</td><td><button class="mini-copy">コピー</button></td></tr>
+              <tr><td>途中で話が飛んだ</td><td data-phrase>いまどこまで終わっていて、次に何をすればいいか、3行でまとめてください。</td><td><button class="mini-copy">コピー</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div></div></div>
+    </section>
+
+  </div>
+
+  <div class="closing">
+    <p class="thesis">AI に<em>お願いする</em>のではなく、<em>仕組みで縛る</em>。</p>
+    <div class="recap">
+      <div><span>STEP 01</span><div>CLAUDE.md ＝ 毎回の説明をゼロにする</div></div>
+      <div><span>STEP 02</span><div>役割分業 ＝ 設計する人・手を動かす人・採点する人を分ける</div></div>
+      <div><span>STEP 03</span><div>フック ＝ ルールを「お願い」ではなく「強制」にする</div></div>
+      <div><span>STEP 04</span><div>スキル ＝ よく使う手順を合言葉ひとつにする</div></div>
+      <div><span>STEP 05</span><div>記録 ＝ 忘れてもいい状態をつくる</div></div>
+    </div>
+    <p class="colophon">STEP 1 と STEP 3 だけでも、AI との作業はかなり楽になります。<br>進捗はこのブラウザに保存されるので、途中で閉じても続きから進められます。<br><br>作成：eri</p>
+  </div>
+
+</div>
+
+<script>
+  (function () {
+    var KEY = 'cc-setup-progress-v2';
+    var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
+    // 進捗の分母は必須ステップだけ（.optional は任意なので数えない）
+    var required = steps.filter(function (s) { return !s.classList.contains('optional'); });
+    var pbar = document.getElementById('pbar');
+    var pcount = document.getElementById('pcount');
+    var state = {};
+
+    try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { state = {}; }
+    function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+    function renderProgress() {
+      var done = required.filter(function (s) { return state[s.id]; }).length;
+      pbar.style.width = (done / required.length * 100) + '%';
+      pcount.textContent = done + ' / ' + required.length;
+    }
+
+    function setOpen(step, open) {
+      step.classList.toggle('open', open);
+      step.querySelector('.step-head').setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    function openOnly(step) {
+      steps.forEach(function (s) { setOpen(s, s === step); });
+    }
+
+    steps.forEach(function (step, i) {
+      var head = step.querySelector('.step-head');
+      var inner = step.querySelector('.body-in');
+
+      // 各ステップの最後に「完了！次へ」を足す
+      var foot = document.createElement('div');
+      foot.className = 'stepfoot';
+      var optional = step.classList.contains('optional');
+      var next = document.createElement('button');
+      next.className = 'next-btn';
+      next.innerHTML = (optional ? '今回は飛ばす' : (i === steps.length - 1 ? 'これで完成！' : '完了！次へ')) + ' <span class="arw">→</span>';
+      var undo = document.createElement('button');
+      undo.className = 'undo-btn';
+      undo.textContent = 'まだ終わっていない';
+      foot.appendChild(next);
+      foot.appendChild(undo);
+      inner.appendChild(foot);
+
+      if (state[step.id]) step.classList.add('done');
+
+      head.addEventListener('click', function () {
+        var willOpen = !step.classList.contains('open');
+        if (willOpen) {
+          openOnly(step);
+          setTimeout(function () {
+            step.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 60);
+        } else {
+          setOpen(step, false);
+        }
+      });
+
+      next.addEventListener('click', function () {
+        state[step.id] = 1;
+        step.classList.add('done');
+        save();
+        renderProgress();
+        var target = steps[i + 1];
+        if (target) {
+          openOnly(target);
+          setTimeout(function () {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 60);
+        } else {
+          setOpen(step, false);
+        }
+      });
+
+      undo.addEventListener('click', function () {
+        delete state[step.id];
+        step.classList.remove('done');
+        save();
+        renderProgress();
+      });
+    });
+
+    // 最初に開くのは「まだ終わっていない一番上のステップ」
+    var firstOpen = steps.filter(function (s) { return !state[s.id]; })[0] || steps[0];
+    setOpen(firstOpen, true);
+    renderProgress();
+
+    // ---------- コピー ----------
+    function flash(btn, label) {
+      var original = btn.dataset.label || btn.textContent;
+      btn.dataset.label = original;
+      btn.textContent = label;
+      btn.classList.add('copied');
+      setTimeout(function () {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 1600);
+    }
+
+    function selectNode(node) {
+      var sel = window.getSelection();
+      var range = document.createRange();
+      range.selectNodeContents(node);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    // 選択してから execCommand。失敗しても選択は残るので Ctrl+C で拾える。
+    function selectAndCopy(node) {
+      selectNode(node);
+      try { return document.execCommand('copy'); } catch (e) { return false; }
+    }
+
+    function copyFrom(node, btn) {
+      var str = node.textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(str).then(
+          function () { flash(btn, 'コピーしました'); },
+          function () { flash(btn, selectAndCopy(node) ? 'コピーしました' : 'Ctrl+C を押して'); }
+        );
+      } else {
+        flash(btn, selectAndCopy(node) ? 'コピーしました' : 'Ctrl+C を押して');
+      }
+    }
+
+    document.querySelectorAll('.paste').forEach(function (box) {
+      var pre = box.querySelector('pre');
+      var btn = box.querySelector('.copy-btn');
+      btn.addEventListener('click', function () { copyFrom(pre, btn); });
+      pre.addEventListener('click', function () { selectNode(pre); });
+    });
+
+    document.querySelectorAll('.mini-copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        copyFrom(btn.closest('tr').querySelector('[data-phrase]'), btn);
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
