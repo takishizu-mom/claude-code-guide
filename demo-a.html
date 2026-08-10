@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>DEMO ── Claude Code 環境づくり 手順書</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #EFEDE6;
+    --paper-2: #F7F5EF;
+    --ink: #191919;
+    --ink-2: #3C3A36;
+    --ink-3: #6B6862;
+    --red: #C10000;
+    --hair: rgba(25,25,25,.26);
+    --hair-2: rgba(25,25,25,.14);
+    --mincho: "Hiragino Mincho ProN", "Yu Mincho", YuMincho, "Noto Serif JP", "Times New Roman", serif;
+    --gothic: "Hiragino Sans", "Yu Gothic Medium", "Yu Gothic", "Noto Sans JP", Meiryo, system-ui, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --fraktur: "UnifrakturMaguntia", "Old English Text MT", serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--paper); -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--gothic);
+    font-size: 16px;
+    line-height: 1.85;
+    -webkit-font-smoothing: antialiased;
+    /* 日本語の改行を単語単位で折る（変な位置で割れないように） */
+    word-break: normal;
+    overflow-wrap: break-word;
+    line-break: strict;
+  }
+
+  /* ── 紙の質感：粗い繊維 ＋ 細かい網点 ＋ 経年のムラ ── */
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 9998;
+    mix-blend-mode: multiply; opacity: .9;
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='220' height='220' filter='url(%23f)' opacity='.34'/></svg>"),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='6'><circle cx='1' cy='1' r='.6' fill='%23191919' opacity='.10'/><circle cx='4' cy='4' r='.6' fill='%23191919' opacity='.07'/></svg>");
+    background-size: 220px 220px, 6px 6px;
+  }
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 9997;
+    mix-blend-mode: multiply; opacity: .55;
+    background:
+      radial-gradient(70% 55% at 8% 6%, rgba(150,130,90,.16), transparent 60%),
+      radial-gradient(60% 45% at 96% 32%, rgba(150,130,90,.14), transparent 62%),
+      radial-gradient(80% 60% at 50% 104%, rgba(120,105,80,.13), transparent 60%);
+  }
+
+  .sheet {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 14px 80px;
+    position: relative;
+    z-index: 1;
+  }
+  @media (min-width: 720px) { .sheet { padding: 0 32px 96px; } }
+
+  /* ───────── 題字 ───────── */
+  .ears {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+    font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--ink-3); padding: 16px 0 7px;
+  }
+  .ears span { white-space: nowrap; }
+
+  .rule-double { border-top: 3px solid var(--ink); border-bottom: 1px solid var(--ink); height: 4px; }
+  .rule-double.flip { border-top: 1px solid var(--ink); border-bottom: 3px solid var(--ink); }
+
+  .nameplate {
+    font-family: var(--fraktur);
+    font-size: clamp(30px, 9.6vw, 74px);
+    line-height: 1.08;
+    text-align: center;
+    margin: 12px 0 10px;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  .headline {
+    font-family: var(--mincho);
+    font-weight: 900;
+    font-size: clamp(23px, 6.6vw, 40px);
+    line-height: 1.36;
+    letter-spacing: -.03em;
+    text-align: center;
+    margin: 16px 0 10px;
+  }
+  /* かたまりごとに折る＝中途半端な位置で割れない */
+  .headline .chunk { display: inline-block; }
+  .headline .chunk.red { color: var(--red); }
+
+  .lede {
+    font-family: var(--mincho);
+    text-align: center;
+    font-size: 14.5px;
+    color: var(--ink-2);
+    margin: 0 auto 18px;
+    max-width: 34em;
+  }
+  .lede .chunk { display: inline-block; }
+
+  /* 発行データ欄 */
+  .colophon {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    border-top: 1px solid var(--ink);
+    border-bottom: 3px solid var(--ink);
+  }
+  @media (min-width: 640px) { .colophon { grid-template-columns: repeat(4, 1fr); } }
+  .colophon div {
+    padding: 8px 8px;
+    border-right: 1px solid var(--hair-2);
+    border-bottom: 1px solid var(--hair-2);
+    text-align: center;
+  }
+  @media (min-width: 640px) { .colophon div { border-bottom: 0; } }
+  .colophon div:nth-child(2n) { border-right: 0; }
+  @media (min-width: 640px) {
+    .colophon div:nth-child(2n) { border-right: 1px solid var(--hair-2); }
+    .colophon div:last-child { border-right: 0; }
+  }
+  .colophon dt {
+    font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--ink-3); margin-bottom: 1px;
+  }
+  .colophon dd {
+    margin: 0; font-family: var(--mincho); font-size: 13.5px; font-weight: 700;
+    line-height: 1.45; font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* 社告 */
+  .notice { border: 2px solid var(--ink); padding: 14px 16px 12px; margin: 22px 0 26px; background: var(--paper-2); }
+  .notice h2 {
+    font-size: 11px; letter-spacing: .22em; margin: 0 0 4px; text-align: center; color: var(--ink);
+  }
+  .notice .orn { text-align: center; color: var(--ink-3); font-size: 9px; letter-spacing: .5em; margin-bottom: 9px; }
+  .notice ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; counter-reset: nt; font-size: 14px; }
+  .notice li { counter-increment: nt; position: relative; padding-left: 24px; }
+  .notice li::before {
+    content: counter(nt); position: absolute; left: 0; top: .18em;
+    font-size: 10px; font-weight: 700; color: var(--paper);
+    background: var(--ink); width: 17px; height: 17px; line-height: 17px; text-align: center;
+  }
+
+  /* ───────── 記事 ───────── */
+  .article { border-top: 1px solid var(--ink); }
+  .article:last-of-type { border-bottom: 3px solid var(--ink); }
+
+  .art-head {
+    width: 100%; display: grid; grid-template-columns: 58px 1fr 20px; gap: 12px;
+    align-items: center; padding: 16px 2px; background: none; border: 0;
+    font: inherit; color: inherit; text-align: left; cursor: pointer;
+  }
+  @media (min-width: 640px) { .art-head { grid-template-columns: 88px 1fr 24px; gap: 18px; padding: 20px 2px; } }
+  .art-num {
+    font-family: var(--mincho); font-weight: 900;
+    font-size: 46px; line-height: .82; color: var(--red);
+    text-align: center; font-variant-numeric: tabular-nums; letter-spacing: -.05em;
+  }
+  @media (min-width: 640px) { .art-num { font-size: 60px; } }
+  .article.done .art-num { color: var(--ink-3); }
+  .art-kicker {
+    display: block; font-size: 9.5px; letter-spacing: .2em;
+    color: var(--ink-3); margin-bottom: 3px;
+  }
+  .art-title { font-family: var(--mincho); font-weight: 900; font-size: clamp(18px, 4.6vw, 26px); line-height: 1.42; letter-spacing: -.025em; }
+  .art-title .chunk { display: inline-block; }
+  .art-meta { display: block; font-family: var(--gothic); font-size: 10.5px; font-weight: 500; letter-spacing: .06em; color: var(--ink-3); margin-top: 5px; }
+  .art-sign { font-size: 19px; color: var(--ink-3); line-height: 1; text-align: center; }
+  .article.open .art-sign { color: var(--red); }
+
+  .art-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s cubic-bezier(.2,.7,.2,1); }
+  .article.open .art-body { grid-template-rows: 1fr; }
+  .art-body > div { overflow: hidden; }
+  .art-in { padding: 2px 2px 30px; border-top: 1px solid var(--hair-2); }
+
+  /* 前文（ドロップキャップ＋段組み） */
+  .standfirst {
+    font-family: var(--mincho); font-size: 15.5px; line-height: 1.85;
+    margin: 16px 0 20px; padding-bottom: 16px; border-bottom: 1px solid var(--hair);
+  }
+  @media (min-width: 720px) { .standfirst { column-count: 2; column-gap: 30px; column-rule: 1px solid var(--hair-2); } }
+  .standfirst::first-letter {
+    font-family: var(--mincho); font-size: 3.1em; font-weight: 900;
+    float: left; line-height: .92; padding: .06em .12em 0 0; color: var(--ink);
+  }
+
+  /* 黒タグ */
+  .tagline { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; margin: 18px 0; }
+  .tag {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .1em;
+    background: var(--ink); color: var(--paper); padding: 3px 9px; white-space: nowrap; display: inline-block;
+  }
+  .tag.red { background: var(--red); }
+  .tagline p { margin: 0; font-size: 15.5px; font-weight: 700; line-height: 1.7; }
+
+  /* 工程（→ の羅列をやめた縦並び） */
+  .flow { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--hair-2); }
+  .flow li {
+    display: grid; grid-template-columns: 20px 1fr; gap: 11px; align-items: baseline;
+    padding: 9px 2px; border-bottom: 1px solid var(--hair-2);
+    font-size: 15px; font-weight: 700;
+  }
+  .flow li span {
+    font-family: var(--gothic); font-weight: 700; font-size: 11px;
+    color: var(--paper); background: var(--ink);
+    width: 20px; height: 20px; line-height: 20px;
+    text-align: center; font-variant-numeric: tabular-nums;
+    align-self: center;
+  }
+
+  /* 項目＝囲み段。見出しは黒帯にして区切りをはっきりさせる */
+  .sect {
+    border: 1px solid var(--ink);
+    margin: 0 0 16px;
+    background: rgba(255,255,255,.34);
+  }
+  .sect-head {
+    display: flex; align-items: baseline; gap: 10px;
+    background: var(--ink); color: var(--paper);
+    padding: 9px 12px; margin: 0;
+    font-family: var(--mincho); font-weight: 900; font-size: 17px;
+    letter-spacing: -.02em; line-height: 1.5;
+  }
+  .sect-head .n {
+    font-family: var(--gothic); font-size: 10px; letter-spacing: .12em; font-weight: 700;
+    border: 1px solid rgba(239,237,230,.55); padding: 2px 7px; white-space: nowrap;
+    flex: none;
+  }
+  .sect-body { padding: 14px 14px 3px; }
+  .sect-body > *:last-child { margin-bottom: 12px; }
+
+  p { margin: 0 0 12px; }
+  a { color: var(--ink); text-decoration-color: var(--red); text-underline-offset: 3px; }
+
+  ol.steps { margin: 0 0 18px; padding: 0; list-style: none; counter-reset: si; }
+  ol.steps li { counter-increment: si; position: relative; padding-left: 28px; margin-bottom: 9px; }
+  ol.steps li::before {
+    content: counter(si); position: absolute; left: 0; top: .16em;
+    font-size: 10.5px; font-weight: 700; color: var(--paper); background: var(--ink);
+    width: 18px; height: 18px; line-height: 18px; text-align: center;
+  }
+  .aside-small { font-size: 13px; color: var(--ink-3); }
+
+  code {
+    font-family: var(--mono); font-size: 12.5px; font-weight: 700;
+    background: rgba(25,25,25,.07); padding: 1px 5px;
+  }
+
+  .gloss { border-left: 3px solid var(--ink); padding: 9px 0 9px 13px; margin: 0 0 18px; font-size: 14px; color: var(--ink-2); }
+  .gloss b { display: block; font-size: 9.5px; letter-spacing: .2em; color: var(--ink-3); margin-bottom: 3px; }
+  .gloss p { margin: 0; }
+
+  .alert {
+    border-top: 3px solid var(--ink); border-bottom: 3px solid var(--ink);
+    padding: 11px 0; margin: 0 0 18px;
+    display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start;
+  }
+  .alert p { margin: 0; font-size: 14.5px; }
+
+  /* 貼り付け枠＝黒の号外ボックス */
+  .clip { border: 3px solid var(--ink); background: var(--ink); margin: 0 0 20px; }
+  .clip-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 7px 7px 7px 11px; border-bottom: 1px solid rgba(239,237,230,.25);
+  }
+  .clip-label { font-size: 10px; letter-spacing: .18em; font-weight: 700; color: var(--paper); }
+  .copy-btn {
+    font-family: var(--gothic); font-size: 10.5px; font-weight: 700; letter-spacing: .1em;
+    background: var(--red); color: #fff; border: 0; padding: 6px 14px; cursor: pointer;
+  }
+  .copy-btn:hover { background: var(--paper); color: var(--ink); }
+  .copy-btn.copied { background: var(--paper); color: var(--ink); }
+  .clip pre {
+    margin: 0; padding: 14px 14px;
+    font-family: var(--mono); font-size: 12px; line-height: 1.8;
+    white-space: pre-wrap; word-break: break-word; overflow: auto; max-height: 300px;
+    cursor: text; color: #EFEDE6;
+  }
+  .clip-foot { padding: 6px 12px; font-size: 10.5px; color: rgba(239,237,230,.62); border-top: 1px solid rgba(239,237,230,.2); }
+
+  figure { margin: 0 0 20px; }
+  figure svg { display: block; width: 100%; height: auto; border: 1px solid var(--hair); background: var(--paper-2); }
+  figcaption {
+    font-size: 10.5px; color: var(--ink-3); letter-spacing: .05em;
+    padding-top: 5px; margin-top: 5px; border-top: 1px solid var(--hair-2);
+  }
+  .f-frame { fill: #fff; stroke: var(--ink); stroke-width: 1.5; }
+  .f-tab { fill: none; stroke: var(--hair-2); stroke-width: 1; }
+  .f-tab-on { fill: var(--ink); }
+  .f-t { fill: var(--ink-2); font-family: var(--gothic); font-size: 14px; font-weight: 700; }
+  .f-t-on { fill: #fff; font-family: var(--gothic); font-size: 14px; font-weight: 800; }
+  .f-note { fill: var(--red); font-family: var(--gothic); font-size: 13px; font-weight: 800; }
+  .f-dim { fill: var(--ink-3); font-family: var(--gothic); font-size: 11.5px; }
+  .f-arw { stroke: var(--red); stroke-width: 2; fill: none; stroke-linecap: round; }
+
+  .verify {
+    border: 1px solid var(--ink); border-left: 7px solid var(--ink);
+    padding: 13px 16px; margin: 0 0 18px; background: var(--paper-2);
+  }
+  .verify b { font-size: 10px; letter-spacing: .2em; color: var(--ink-3); display: block; margin-bottom: 4px; }
+  .verify p { margin: 0; font-size: 15px; }
+
+  /* 記事の終わり＝切り取り線＋大きな受付ボタン */
+  .art-foot {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px dashed var(--ink);
+    display: grid;
+    gap: 10px;
+  }
+  .foot-label {
+    font-size: 10.5px; letter-spacing: .2em; color: var(--ink-3);
+    text-align: center; margin: 0 0 2px;
+  }
+  .next-btn {
+    font-family: var(--gothic); font-size: 17px; font-weight: 800; letter-spacing: .04em;
+    background: var(--red); color: #fff;
+    border: 2px solid var(--ink);
+    padding: 17px 20px; cursor: pointer; width: 100%;
+    box-shadow: 6px 6px 0 var(--ink);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: transform .08s, box-shadow .08s;
+  }
+  .next-btn .mark {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border: 2px solid #fff; font-size: 14px; flex: none;
+  }
+  .next-btn:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
+  .undo-btn {
+    font-family: var(--gothic); font-size: 13px; font-weight: 700;
+    background: none; border: 1px solid var(--hair); color: var(--ink-3);
+    padding: 13px; cursor: pointer; width: 100%;
+  }
+  .undo-btn:hover { border-color: var(--ink); color: var(--ink); }
+  /* 完了した記事の見え方 */
+  .article.done .art-title { color: var(--ink-3); }
+  .stamp {
+    display: none;
+    font-size: 10px; font-weight: 800; letter-spacing: .18em;
+    border: 2px solid var(--red); color: var(--red);
+    padding: 2px 8px; transform: rotate(-4deg); white-space: nowrap;
+    margin-top: 6px;
+  }
+  .article.done .stamp { display: inline-block; }
+
+  .demo-note { margin-top: 34px; padding-top: 14px; border-top: 3px solid var(--ink); font-size: 12.5px; color: var(--ink-3); line-height: 1.9; }
+
+  :focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; } }
+</style>
+
+<div class="sheet">
+
+  <header>
+    <div class="ears">
+      <span>Setup Guide</span>
+      <span>第 1 号 ・ Windows 版</span>
+    </div>
+    <div class="rule-double"></div>
+
+    <h1 class="nameplate">The Claude Code Times</h1>
+
+    <div class="rule-double flip"></div>
+
+    <p class="headline"><span class="chunk">Claude Code を</span><span class="chunk red">「自分専用の開発チーム」</span><span class="chunk">にする</span></p>
+    <p class="lede"><span class="chunk">上から順にコピペしていくだけで完成する。</span><span class="chunk">プログラミングの知識は要りません。</span></p>
+
+    <dl class="colophon">
+      <div><dt>対象</dt><dd>Windows</dd></div>
+      <div><dt>読者</dt><dd>非エンジニア</dd></div>
+      <div><dt>所要時間</dt><dd>約 90 分</dd></div>
+      <div><dt>編集</dt><dd>eri</dd></div>
+    </dl>
+
+    <div class="notice">
+      <h2>本紙の読み方</h2>
+      <p class="orn">◆ ◆ ◆</p>
+      <ol>
+        <li>見出しを押すと、その記事だけ開きます</li>
+        <li>囲み枠の「コピー」を押して、Claude Code に貼り付け</li>
+        <li>確認までできたら「完了、次へ」を押します</li>
+      </ol>
+    </div>
+  </header>
+
+  <!-- ───────── STEP 0 ───────── -->
+  <article class="article open" id="step0">
+    <button class="art-head" aria-expanded="true">
+      <span class="art-num">0</span>
+      <span class="art-title">
+        <span class="art-kicker">第一報</span>
+        <span class="chunk">準備 ──</span><span class="chunk">インストールから</span><span class="chunk">作業フォルダを開くまで</span>
+        <span class="art-meta">約 25 分 ・ 貼り付け 1回</span>
+      </span>
+      <span class="art-sign">−</span>
+    </button>
+    <div class="art-body"><div><div class="art-in">
+
+      <p class="standfirst">最初のつまずきは、ほぼここで起きる。Claude のアプリには三つのタブがあり、ファイルを作れるのはそのうち一つだけである。契約・インストール・Git・作業フォルダ──この四つを順に片づければ、あとは貼るだけの作業になる。</p>
+
+      <div class="tagline">
+        <span class="tag">すること</span>
+        <p>次の四つを、上から順に片づけます</p>
+      </div>
+
+      <ol class="flow">
+        <li><span>1</span>有料プランを契約する</li>
+        <li><span>2</span>Claude のアプリを入れる</li>
+        <li><span>3</span>Git for Windows を入れる</li>
+        <li><span>4</span>Code タブで作業フォルダを開く</li>
+      </ol>
+
+      <section class="sect">
+        <h3 class="sect-head"><span class="n">0-1</span>有料プランに入る</h3>
+        <div class="sect-body">
+          <p>Claude Code は<strong>無料プランでは使えません</strong>。Pro（月20ドル）以上が必要です。</p>
+          <ol class="steps">
+            <li><a href="https://claude.ai/">claude.ai</a> を開く</li>
+            <li>画面のすみにある自分の名前（アカウント）をクリック</li>
+            <li>「プランをアップグレード」を選ぶ</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="sect">
+        <h3 class="sect-head"><span class="n">0-2</span>Claude のアプリを入れる</h3>
+        <div class="sect-body">
+          <ol class="steps">
+            <li><a href="https://claude.ai/api/desktop/win32/x64/setup/latest/redirect">Windows 版をダウンロード</a><br><span class="aside-small">※ ARM の PC の人は <a href="https://claude.ai/api/desktop/win32/arm64/setup/latest/redirect">ARM64 版</a></span></li>
+            <li>ダウンロードしたファイルをダブルクリックしてインストール</li>
+            <li>スタートメニューから <strong>Claude</strong> を起動して、アカウントでログイン</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="sect">
+        <h3 class="sect-head"><span class="n">0-3</span>Git for Windows を入れる</h3>
+        <div class="sect-body">
+          <p><a href="https://git-scm.com/downloads/win">git-scm.com/downloads/win</a> からダウンロードして、ずっと「Next」を押していけば完了です。</p>
+          <div class="alert">
+            <span class="tag red">警告</span>
+            <p><strong>Windows では Git が入っていないと、この先の作業そのものが動きません。</strong>「あとで」にせず、ここで入れてください。</p>
+          </div>
+          <div class="gloss">
+            <b>用語メモ</b>
+            <p><code>Git</code>＝本来はプログラムの変更履歴を管理する道具。Windows の Claude Code は内部でこれを使うので、無いと動きません。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="sect">
+        <h3 class="sect-head"><span class="n">0-4</span>「Code」タブを開いて作業フォルダを選ぶ</h3>
+        <div class="sect-body">
+          <p>Claude のアプリには <strong>Chat ／ Cowork ／ Code</strong> の三つのタブがあります。<strong>ファイルを作れるのは Code タブだけ</strong>です。いつものチャット画面に貼っても何も起きません。</p>
+          <ol class="steps">
+            <li>アプリの<strong>画面いちばん上の中央</strong>にある <strong>「Code」</strong> をクリック<br><span class="aside-small">※「アップグレードして」と出たら、0-1 の契約がまだです</span></li>
+            <li>環境を選ぶところで <strong>「Local」</strong> をクリック</li>
+            <li><strong>「Select folder」</strong> ボタンをクリック</li>
+            <li>デスクトップに <code>claude-練習</code> という新しいフォルダを作って、それを選ぶ</li>
+          </ol>
+
+      <figure>
+        <svg viewBox="0 0 560 132" role="img" aria-label="アプリ上部の Chat・Cowork・Code タブのうち Code をクリックする図">
+          <defs>
+            <pattern id="halftone" width="4" height="4" patternUnits="userSpaceOnUse">
+              <circle cx="1" cy="1" r=".75" fill="#191919" opacity=".22"/>
+            </pattern>
+          </defs>
+          <rect x="8" y="8" width="544" height="76" fill="#fff"/>
+          <rect x="8" y="8" width="544" height="76" fill="url(#halftone)"/>
+          <rect class="f-frame" x="8" y="8" width="544" height="76" fill="none"/>
+          <rect class="f-tab" x="176" y="28" width="76" height="34"/>
+          <text class="f-t" x="214" y="51" text-anchor="middle">Chat</text>
+          <rect class="f-tab" x="256" y="28" width="94" height="34"/>
+          <text class="f-t" x="303" y="51" text-anchor="middle">Cowork</text>
+          <rect class="f-tab-on" x="354" y="28" width="80" height="34"/>
+          <text class="f-t-on" x="394" y="51" text-anchor="middle">Code</text>
+          <path class="f-arw" d="M394 104 L394 70"/>
+          <path class="f-arw" d="M387 78 L394 68 L401 78"/>
+          <text class="f-note" x="394" y="122" text-anchor="middle">ここをクリック</text>
+          <text class="f-dim" x="22" y="51">アプリの上のほう</text>
+        </svg>
+        <figcaption>図1 ── ファイルを作れるのは Code タブだけである</figcaption>
+      </figure>
+        </div>
+      </section>
+
+      <section class="sect">
+        <h3 class="sect-head"><span class="n">0-5</span>動くか確認する</h3>
+        <div class="sect-body">
+      <div class="tagline">
+        <span class="tag">貼る</span>
+        <p>Code タブの下のほうにある入力欄に貼り付けます</p>
+      </div>
+
+      <div class="clip">
+        <div class="clip-bar"><span class="clip-label">貼り付ける</span><button class="copy-btn">コピー</button></div>
+        <pre>自己紹介と、今このパソコンで何ができるかを3行で教えてください。
+あと、いま開いている作業フォルダの場所と、
+私のホームフォルダの場所（C:\Users\〜）も教えてください。</pre>
+        <div class="clip-foot">枠の中をクリックすると全部選べます</div>
+      </div>
+
+      <div class="verify">
+        <b>確認</b>
+        <p>返事の中に <strong>C:\Users\自分の名前</strong> のような場所が出てくれば成功です。出てこない場合は、0-4 の「Code」タブに入れているか確かめてください。</p>
+      </div>
+        </div>
+      </section>
+
+      <div class="art-foot">
+        <p class="foot-label">── ここまで終わったら ──</p>
+        <button class="next-btn"><span class="mark">✓</span>完了、次の記事へ</button>
+        <button class="undo-btn">まだ終わっていない（あとで戻る）</button>
+      </div>
+
+    </div></div></div>
+  </article>
+
+  <article class="article" id="step1">
+    <button class="art-head" aria-expanded="false">
+      <span class="art-num">1</span>
+      <span class="art-title">
+        <span class="art-kicker">第二報</span>
+        <span class="chunk">自分専用の</span><span class="chunk">取扱説明書をつくる</span>
+        <span class="art-meta">CLAUDE.md ／ 約 15 分 ・ 貼り付け 1回</span>
+      </span>
+      <span class="art-sign">＋</span>
+    </button>
+    <div class="art-body"><div><div class="art-in">
+      <div class="tagline"><span class="tag">すること</span><p>質問に答えるだけ。Claude が取扱説明書を書いて保存します</p></div>
+      <p class="aside-small">（デモのため中身は省略しています）</p>
+    </div></div></div>
+  </article>
+
+  <article class="article done" id="step2">
+    <button class="art-head" aria-expanded="false">
+      <span class="art-num">2</span>
+      <span class="art-title">
+        <span class="art-kicker">第三報</span>
+        <span class="chunk">担当者を三人つくる</span>
+        <span class="art-meta">サブエージェント ／ 約 10 分</span>
+        <span class="stamp">済</span>
+      </span>
+      <span class="art-sign">＋</span>
+    </button>
+    <div class="art-body"><div><div class="art-in">
+      <p class="aside-small">（完了した記事は番号が灰色になります）</p>
+    </div></div></div>
+  </article>
+
+  <p class="demo-note">
+    ── これはデザイン確認用のデモです。STEP 0 の中身だけ本物を入れ、STEP 1・2 は見出しの見え方だけ置いています。
+  </p>
+
+</div>
+
+<script>
+  document.querySelectorAll('.art-head').forEach(function (h) {
+    h.addEventListener('click', function () {
+      var art = h.closest('.article');
+      var open = art.classList.toggle('open');
+      h.setAttribute('aria-expanded', open ? 'true' : 'false');
+      h.querySelector('.art-sign').textContent = open ? '−' : '＋';
+    });
+  });
+
+  function selectNode(n) {
+    var s = window.getSelection(), r = document.createRange();
+    r.selectNodeContents(n); s.removeAllRanges(); s.addRange(r);
+  }
+  document.querySelectorAll('.clip').forEach(function (box) {
+    var pre = box.querySelector('pre'), btn = box.querySelector('.copy-btn');
+    pre.addEventListener('click', function () { selectNode(pre); });
+    btn.addEventListener('click', function () {
+      var done = function (label) {
+        btn.textContent = label; btn.classList.add('copied');
+        setTimeout(function () { btn.textContent = 'コピー'; btn.classList.remove('copied'); }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(pre.textContent).then(
+          function () { done('コピーしました'); },
+          function () { selectNode(pre); done('Ctrl+C を押して'); }
+        );
+      } else { selectNode(pre); done('Ctrl+C を押して'); }
+    });
+  });
+</script>
+
+</body>
+</html>
