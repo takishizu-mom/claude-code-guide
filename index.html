@@ -233,6 +233,32 @@
   }
 
   /* ---------- body content ---------- */
+  /* 図解 */
+  .figure {
+    margin: 0 0 18px;
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    background: var(--paper);
+    padding: 14px 16px 10px;
+  }
+  .figure svg { display: block; width: 100%; height: auto; }
+  .figure figcaption {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
+    color: var(--ink-3); text-align: center; margin-top: 8px;
+  }
+  .fig-win { fill: var(--card); stroke: var(--rule); stroke-width: 1.5; }
+  .fig-bar { fill: var(--rule-soft); }
+  .fig-tab { fill: none; }
+  .fig-tab-on { fill: var(--spot); }
+  .fig-txt { fill: var(--ink-2); font-family: var(--jp); font-size: 14px; font-weight: 700; }
+  .fig-txt-on { fill: #fff; font-family: var(--jp); font-size: 14px; font-weight: 800; }
+  .fig-note { fill: var(--spot); font-family: var(--jp); font-size: 13.5px; font-weight: 800; }
+  .fig-dim { fill: var(--ink-3); font-family: var(--jp); font-size: 12.5px; }
+  .fig-arrow { stroke: var(--spot); stroke-width: 2; fill: none; stroke-linecap: round; }
+  .fig-chip { fill: var(--card); stroke: var(--rule); stroke-width: 1.5; }
+  .fig-chip-on { fill: var(--spot-soft); stroke: var(--spot); stroke-width: 2; }
+  .fig-btn { fill: var(--spot); }
+
   /* このSTEPですること */
   .todo {
     display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start;
@@ -481,6 +507,47 @@
           <li><strong>「Select folder」</strong> ボタンをクリック</li>
           <li>デスクトップなどに <code>claude-練習</code> という<strong>新しいフォルダを作って</strong>、それを選ぶ</li>
         </ol>
+
+        <figure class="figure">
+          <svg viewBox="0 0 560 132" role="img" aria-label="アプリ上部の Chat・Cowork・Code タブのうち、Code をクリックする図">
+            <rect class="fig-win" x="8" y="8" width="544" height="76" rx="9"/>
+            <rect class="fig-bar" x="9" y="9" width="542" height="1"/>
+            <rect class="fig-tab" x="176" y="28" width="76" height="34" rx="7"/>
+            <text class="fig-txt" x="214" y="51" text-anchor="middle">Chat</text>
+            <rect class="fig-tab" x="256" y="28" width="94" height="34" rx="7"/>
+            <text class="fig-txt" x="303" y="51" text-anchor="middle">Cowork</text>
+            <rect class="fig-tab-on" x="354" y="28" width="80" height="34" rx="7"/>
+            <text class="fig-txt-on" x="394" y="51" text-anchor="middle">Code</text>
+            <path class="fig-arrow" d="M394 104 L394 70"/>
+            <path class="fig-arrow" d="M387 78 L394 68 L401 78"/>
+            <text class="fig-note" x="394" y="122" text-anchor="middle">① ここをクリック</text>
+            <text class="fig-dim" x="24" y="51">アプリの上のほう</text>
+          </svg>
+          <figcaption>図1 ── ファイルを作れるのは Code タブだけ</figcaption>
+        </figure>
+
+        <figure class="figure">
+          <svg viewBox="0 0 560 186" role="img" aria-label="Local を選び、Select folder ボタンで作業フォルダを選ぶ図">
+            <rect class="fig-win" x="8" y="8" width="544" height="130" rx="9"/>
+            <text class="fig-dim" x="28" y="38">どこで動かす？</text>
+            <rect class="fig-chip-on" x="28" y="50" width="86" height="34" rx="7"/>
+            <text class="fig-txt" x="71" y="73" text-anchor="middle">Local</text>
+            <rect class="fig-chip" x="122" y="50" width="80" height="34" rx="7"/>
+            <text class="fig-dim" x="162" y="72" text-anchor="middle">Cloud</text>
+            <rect class="fig-chip" x="210" y="50" width="70" height="34" rx="7"/>
+            <text class="fig-dim" x="245" y="72" text-anchor="middle">SSH</text>
+            <path class="fig-arrow" d="M71 116 L71 90"/>
+            <path class="fig-arrow" d="M64 98 L71 88 L78 98"/>
+            <text class="fig-note" x="71" y="134" text-anchor="middle">② これを選ぶ</text>
+            <rect class="fig-btn" x="360" y="50" width="164" height="38" rx="8"/>
+            <text class="fig-txt-on" x="442" y="74" text-anchor="middle">Select folder</text>
+            <path class="fig-arrow" d="M442 120 L442 94"/>
+            <path class="fig-arrow" d="M435 102 L442 92 L449 102"/>
+            <text class="fig-note" x="442" y="138" text-anchor="middle">③ ここを押してフォルダを選ぶ</text>
+            <text class="fig-dim" x="28" y="172">※ ボタンの文字は英語のままです</text>
+          </svg>
+          <figcaption>図2 ── Local を選んでから、作業フォルダを指定する</figcaption>
+        </figure>
         <div class="term">
           <b>用語メモ</b>
           <p><code>作業フォルダ</code>＝Claude が読み書きしていい場所。ここで選んだフォルダの外は勝手に触りません。最初は中身が空のフォルダで大丈夫です。</p>
