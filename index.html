@@ -269,17 +269,18 @@
   }
   .alert p { margin: 0; font-size: 14.5px; }
 
-  .clip { border: 3px solid var(--ink); background: var(--ink); margin: 0 0 20px; }
-  .clip-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 7px 7px 11px; border-bottom: 1px solid rgba(239,237,230,.25); }
-  .clip-label { font-size: 10px; letter-spacing: .18em; font-weight: 700; color: var(--paper); }
+  /* 貼り付け枠＝薄グレー地の囲み記事（見出しの黒帯と明暗を逆にする） */
+  .clip { border: 1px solid var(--ink); background: #D9D5CB; margin: 0 0 20px; }
+  .clip-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 7px 7px 11px; background: #C6C1B4; border-bottom: 1px solid rgba(25,25,25,.25); }
+  .clip-label { font-size: 10px; letter-spacing: .18em; font-weight: 700; color: var(--ink); }
   .copy-btn { font-family: var(--gothic); font-size: 10.5px; font-weight: 700; letter-spacing: .1em; background: var(--red); color: #fff; border: 0; padding: 6px 14px; cursor: pointer; }
-  .copy-btn:hover, .copy-btn.copied { background: var(--paper); color: var(--ink); }
+  .copy-btn:hover, .copy-btn.copied { background: var(--ink); color: var(--paper); }
   .clip pre {
     margin: 0; padding: 14px; font-family: var(--mono); font-size: 12px; line-height: 1.8;
     white-space: pre-wrap; word-break: break-word; overflow: auto; max-height: 300px;
-    cursor: text; color: #EFEDE6;
+    cursor: text; color: #1A1A1A;
   }
-  .clip-foot { padding: 6px 12px; font-size: 10.5px; color: rgba(239,237,230,.62); border-top: 1px solid rgba(239,237,230,.2); }
+  .clip-foot { padding: 6px 12px; font-size: 10.5px; color: #57544D; border-top: 1px solid rgba(25,25,25,.2); }
 
   figure { margin: 0 0 20px; }
   figure svg { display: block; width: 100%; height: auto; border: 1px solid var(--hair); background: var(--paper-2); }
