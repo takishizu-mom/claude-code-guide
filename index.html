@@ -131,6 +131,54 @@
   .colophon dt { font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 1px; }
   .colophon dd { margin: 0; font-family: var(--mincho); font-size: 13.5px; font-weight: 700; line-height: 1.45; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
+  /* ── 1面トップ：なぜ Claude Code なのか ── */
+  .why { border: 3px solid var(--ink); margin: 22px 0 8px; background: rgba(255,255,255,.28); }
+  .why-in { padding: 20px 16px 16px; }
+  @media (min-width: 720px) { .why-in { padding: 26px 28px 22px; } }
+  .why-kicker {
+    display: inline-block; background: var(--ink); color: var(--paper);
+    font-size: 10.5px; letter-spacing: .28em; font-weight: 700;
+    padding: 4px 12px 4px 14px; margin: 0 0 14px;
+  }
+  .why-head {
+    font-family: var(--mincho); font-weight: 900;
+    font-size: clamp(24px, 6.4vw, 40px); line-height: 1.32; letter-spacing: -.035em;
+    margin: 0 0 14px;
+  }
+  .why-head .chunk { display: inline-block; }
+  .why-head em { font-style: normal; color: var(--red); }
+  .why-lede {
+    font-family: var(--mincho); font-size: 15.5px; line-height: 1.85;
+    margin: 0 0 18px; padding-bottom: 16px; border-bottom: 1px solid var(--hair);
+  }
+  .why-list { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 0; }
+  .why-list li {
+    display: grid; grid-template-columns: 40px 1fr; gap: 12px;
+    padding: 13px 0; border-bottom: 1px solid var(--hair-2);
+  }
+  .why-list li:last-child { border-bottom: 0; }
+  .why-list .n {
+    font-family: var(--mincho); font-weight: 900; font-size: 30px; line-height: .9;
+    color: var(--red); text-align: center; font-variant-numeric: tabular-nums; letter-spacing: -.05em;
+  }
+  .why-list b { display: block; font-size: 16px; font-weight: 800; line-height: 1.5; margin-bottom: 2px; }
+  .why-list span { display: block; font-size: 14px; color: var(--ink-2); line-height: 1.7; }
+  .why-close {
+    font-family: var(--mincho); font-weight: 900; font-size: clamp(16px, 4vw, 21px);
+    line-height: 1.6; letter-spacing: -.02em; margin: 0;
+    border-top: 3px solid var(--ink); padding-top: 14px;
+  }
+  .why-close em { font-style: normal; color: var(--red); }
+
+  /* 副題（今回のセッション名） */
+  .subtitle {
+    display: block; text-align: center; margin: 0 0 16px;
+  }
+  .subtitle span {
+    display: inline-block; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
+    padding: 5px 16px; font-size: 12px; letter-spacing: .18em; font-weight: 700;
+  }
+
   .notice { border: 2px solid var(--ink); padding: 14px 16px 12px; margin: 22px 0 26px; background: var(--paper-2); }
   .notice h2 { font-size: 11px; letter-spacing: .22em; margin: 0 0 4px; text-align: center; }
   .notice .orn { text-align: center; color: var(--ink-3); font-size: 9px; letter-spacing: .5em; margin: 0 0 9px; }
@@ -360,6 +408,41 @@
       <div><dt>所要時間</dt><dd>約 90 分</dd></div>
       <div><dt>編集</dt><dd>eri</dd></div>
     </dl>
+
+    <p class="subtitle"><span>Claude Code 最強化の初期設定</span></p>
+
+    <section class="why">
+      <div class="why-in">
+        <p class="why-kicker">なぜ Claude Code なのか</p>
+        <h2 class="why-head"><span class="chunk">AIを</span><span class="chunk"><em>使い分ける</em>のを、</span><span class="chunk">やめる。</span></h2>
+        <p class="why-lede">調べるのはこのAI、文章はあのAI、記録はまた別のアプリ──そうやって窓を行き来していると、そのたびに前提を説明し直すことになる。Claude Code は、その全部をひとつの窓の中で片づける。</p>
+
+        <ol class="why-list">
+          <li>
+            <span class="n">1</span>
+            <div><b>パソコンの中で、直接つくる</b>
+            <span>チャットで頼むと、ファイルを作り、直し、実際に動かして確かめてくれる。文章をコピーして別のアプリに運ぶ必要がない。</span></div>
+          </li>
+          <li>
+            <span class="n">2</span>
+            <div><b>外のサービスに、そのままつながる</b>
+            <span>Notion や GitHub などに接続できる。作る・記録する・公開するまでが、同じ会話の中で終わる。</span></div>
+          </li>
+          <li>
+            <span class="n">3</span>
+            <div><b>別のAIも、呼び出せる</b>
+            <span>ChatGPT に反論させて、両方の意見を突き合わせることもできる（第七報・任意）。一体だけの意見で決めなくてよい。</span></div>
+          </li>
+          <li>
+            <span class="n">4</span>
+            <div><b>使うほど、自分専用に育つ</b>
+            <span>取扱説明書・専用コマンド・担当者・安全装置。あなたの好みとルールを覚えて、毎回説明する手間が消えていく。</span></div>
+          </li>
+        </ol>
+
+        <p class="why-close">だから、<em>最初にこの設定をする。</em><br>本紙の目的は、そのためだけにある。</p>
+      </div>
+    </section>
 
     <div class="notice">
       <h2>本紙の読み方</h2>
