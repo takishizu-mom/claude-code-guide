@@ -488,6 +488,7 @@
   .copy-btn.copied { background: var(--spot); color: #fff; }
   .paste pre {
     margin: 0;
+    cursor: text;
     padding: 18px 20px;
     overflow-x: auto;
     color: var(--code-ink);
@@ -1304,42 +1305,46 @@ STEP 4 で作った session-log スキルの保存先を、ローカルのファ
       }, 1600);
     }
 
-    function copyText(str, btn) {
+    // 選択状態にしてから execCommand を試す。コピーに失敗しても選択は残るので、
+    // 利用者は Ctrl+C（Mac は ⌘+C）を押せば必ずコピーできる。
+    function selectAndCopy(node) {
+      var sel = window.getSelection();
+      var range = document.createRange();
+      range.selectNodeContents(node);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      try { return document.execCommand('copy'); } catch (e) { return false; }
+    }
+
+    function copyFrom(node, btn) {
+      var str = node.textContent;
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(str).then(
           function () { flash(btn, 'コピーしました'); },
-          function () { fallback(str, btn); }
+          function () { flash(btn, selectAndCopy(node) ? 'コピーしました' : 'Ctrl+C を押して'); }
         );
       } else {
-        fallback(str, btn);
+        flash(btn, selectAndCopy(node) ? 'コピーしました' : 'Ctrl+C を押して');
       }
     }
 
-    function fallback(str, btn) {
-      var ta = document.createElement('textarea');
-      ta.value = str;
-      ta.setAttribute('readonly', '');
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      var ok = false;
-      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
-      document.body.removeChild(ta);
-      flash(btn, ok ? 'コピーしました' : '手動でコピーを');
-    }
-
-    document.querySelectorAll('.paste .copy-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var pre = btn.closest('.paste').querySelector('pre');
-        copyText(pre.textContent, btn);
+    document.querySelectorAll('.paste').forEach(function (box) {
+      var pre = box.querySelector('pre');
+      var btn = box.querySelector('.copy-btn');
+      btn.addEventListener('click', function () { copyFrom(pre, btn); });
+      // 枠の中をクリックしただけでも全選択される（ボタンが効かない環境の保険）
+      pre.addEventListener('click', function () {
+        var sel = window.getSelection();
+        var range = document.createRange();
+        range.selectNodeContents(pre);
+        sel.removeAllRanges();
+        sel.addRange(range);
       });
     });
 
     document.querySelectorAll('.mini-copy').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        var cell = btn.closest('tr').querySelector('[data-phrase]');
-        copyText(cell.textContent.trim(), btn);
+        copyFrom(btn.closest('tr').querySelector('[data-phrase]'), btn);
       });
     });
   })();
