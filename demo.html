@@ -214,16 +214,17 @@
   /* 工程（→ の羅列をやめた縦並び） */
   .flow { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--hair-2); }
   .flow li {
-    display: grid; grid-template-columns: 26px 1fr; gap: 11px; align-items: baseline;
+    display: grid; grid-template-columns: 20px 1fr; gap: 11px; align-items: baseline;
     padding: 9px 2px; border-bottom: 1px solid var(--hair-2);
     font-size: 15px; font-weight: 700;
   }
   .flow li span {
-    font-family: var(--mincho); font-weight: 900; font-size: 15px;
-    color: var(--ink-3); text-align: center; font-variant-numeric: tabular-nums;
+    font-family: var(--gothic); font-weight: 700; font-size: 11px;
+    color: var(--paper); background: var(--ink);
+    width: 20px; height: 20px; line-height: 20px;
+    text-align: center; font-variant-numeric: tabular-nums;
+    align-self: center;
   }
-  .flow li.hot span { color: var(--red); }
-  .flow li.hot { color: var(--ink); }
 
   /* 項目＝囲み段。見出しは黒帯にして区切りをはっきりさせる */
   .sect {
@@ -243,7 +244,6 @@
     border: 1px solid rgba(239,237,230,.55); padding: 2px 7px; white-space: nowrap;
     flex: none;
   }
-  .sect.key .sect-head { background: var(--red); }
   .sect-body { padding: 14px 14px 3px; }
   .sect-body > *:last-child { margin-bottom: 12px; }
 
@@ -390,10 +390,10 @@
       </div>
 
       <ol class="flow">
-        <li><span>一</span>有料プランを契約する</li>
-        <li><span>二</span>Claude のアプリを入れる</li>
-        <li><span>三</span>Git for Windows を入れる</li>
-        <li class="hot"><span>四</span>Code タブで作業フォルダを開く</li>
+        <li><span>1</span>有料プランを契約する</li>
+        <li><span>2</span>Claude のアプリを入れる</li>
+        <li><span>3</span>Git for Windows を入れる</li>
+        <li><span>4</span>Code タブで作業フォルダを開く</li>
       </ol>
 
       <section class="sect">
@@ -434,7 +434,7 @@
         </div>
       </section>
 
-      <section class="sect key">
+      <section class="sect">
         <h3 class="sect-head"><span class="n">0-4</span>「Code」タブを開いて作業フォルダを選ぶ</h3>
         <div class="sect-body">
           <p>Claude のアプリには <strong>Chat ／ Cowork ／ Code</strong> の三つのタブがあります。<strong>ファイルを作れるのは Code タブだけ</strong>です。いつものチャット画面に貼っても何も起きません。</p>
