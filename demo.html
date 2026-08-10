@@ -36,7 +36,8 @@
     color: var(--ink);
     font-family: var(--gothic);
     font-size: 16px;
-    line-height: 1.85;
+    line-height: 1.74;
+    letter-spacing: -.004em;
     -webkit-font-smoothing: antialiased;
     /* 日本語の改行を単語単位で折る（変な位置で割れないように） */
     word-break: normal;
@@ -68,6 +69,9 @@
     padding: 0 14px 80px;
     position: relative;
     z-index: 1;
+    border-left: 1px solid var(--hair-2);
+    border-right: 1px solid var(--hair-2);
+    background: rgba(255,255,255,.16);
   }
   @media (min-width: 720px) { .sheet { padding: 0 32px 96px; } }
 
@@ -81,6 +85,11 @@
 
   .rule-double { border-top: 3px solid var(--ink); border-bottom: 1px solid var(--ink); height: 4px; }
   .rule-double.flip { border-top: 1px solid var(--ink); border-bottom: 3px solid var(--ink); }
+  .rule-wave {
+    height: 6px; margin: 5px 0 0;
+    background-repeat: repeat-x; background-size: 12px 6px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='6'><path d='M0 4 Q3 0 6 4 T12 4' fill='none' stroke='%23191919' stroke-width='.9' opacity='.5'/></svg>");
+  }
 
   .nameplate {
     font-family: var(--fraktur);
@@ -159,6 +168,42 @@
     background: var(--ink); width: 17px; height: 17px; line-height: 17px; text-align: center;
   }
 
+  /* 本日の紙面（目次） */
+  .index {
+    border-top: 3px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 12px 0 10px;
+    margin: 0 0 4px;
+  }
+  .index h2 {
+    font-size: 10.5px; letter-spacing: .24em; margin: 0 0 8px;
+    text-align: center; color: var(--ink);
+  }
+  .index ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 0; }
+  .index li {
+    display: grid; grid-template-columns: 34px 1fr auto; gap: 10px;
+    align-items: baseline; padding: 5px 2px;
+    border-bottom: 1px dotted var(--hair);
+    font-size: 13.5px;
+  }
+  .index li:last-child { border-bottom: 0; }
+  .index .no {
+    font-family: var(--mincho); font-weight: 900; font-size: 15px;
+    color: var(--red); text-align: center; font-variant-numeric: tabular-nums;
+  }
+  .index .ttl { font-weight: 700; }
+  .index .pg { font-size: 10.5px; color: var(--ink-3); letter-spacing: .06em; white-space: nowrap; }
+  .index a { text-decoration: none; color: inherit; display: contents; }
+
+  /* 奥付 */
+  .imprint {
+    margin-top: 30px; padding-top: 14px;
+    border-top: 3px solid var(--ink);
+    display: grid; gap: 3px;
+    font-size: 11px; color: var(--ink-3); letter-spacing: .04em; text-align: center;
+  }
+  .imprint .big { font-family: var(--fraktur); font-size: 20px; color: var(--ink-2); letter-spacing: 0; }
+
   /* ───────── 記事 ───────── */
   .article { border-top: 1px solid var(--ink); }
   .article:last-of-type { border-bottom: 3px solid var(--ink); }
@@ -214,14 +259,14 @@
   /* 工程（→ の羅列をやめた縦並び） */
   .flow { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--hair-2); }
   .flow li {
-    display: grid; grid-template-columns: 20px 1fr; gap: 11px; align-items: baseline;
+    display: grid; grid-template-columns: 42px 1fr; gap: 11px; align-items: baseline;
     padding: 9px 2px; border-bottom: 1px solid var(--hair-2);
     font-size: 15px; font-weight: 700;
   }
   .flow li span {
-    font-family: var(--gothic); font-weight: 700; font-size: 11px;
+    font-family: var(--gothic); font-weight: 700; font-size: 10px; letter-spacing: .04em;
     color: var(--paper); background: var(--ink);
-    width: 20px; height: 20px; line-height: 20px;
+    width: 42px; height: 20px; line-height: 20px;
     text-align: center; font-variant-numeric: tabular-nums;
     align-self: center;
   }
@@ -371,7 +416,7 @@
 
   <header>
     <div class="ears">
-      <span>Setup Guide</span>
+      <span>2026年8月11日 発行</span>
       <span>第 1 号 ・ Windows 版</span>
     </div>
     <div class="rule-double"></div>
@@ -379,6 +424,7 @@
     <h1 class="nameplate">The Claude Code Times</h1>
 
     <div class="rule-double flip"></div>
+    <div class="rule-wave"></div>
 
     <p class="headline"><span class="chunk">Claude Code を</span><span class="chunk red">「自分専用の開発チーム」</span><span class="chunk">にする</span></p>
     <p class="lede"><span class="chunk">上から順にコピペしていくだけで完成する。</span><span class="chunk">プログラミングの知識は要りません。</span></p>
@@ -399,6 +445,18 @@
         <li>確認までできたら「完了、次へ」を押します</li>
       </ol>
     </div>
+    <nav class="index">
+      <h2>本 日 の 紙 面</h2>
+      <ol>
+        <li><span class="no">0</span><span class="ttl">準備 ── インストールから作業フォルダを開くまで</span><span class="pg">25分</span></li>
+        <li><span class="no">1</span><span class="ttl">自分専用の取扱説明書をつくる</span><span class="pg">15分</span></li>
+        <li><span class="no">2</span><span class="ttl">担当者を三人つくる</span><span class="pg">10分</span></li>
+        <li><span class="no">3</span><span class="ttl">安全装置をつける</span><span class="pg">25分</span></li>
+        <li><span class="no">4</span><span class="ttl">自分専用コマンドをつくる</span><span class="pg">10分</span></li>
+        <li><span class="no">5</span><span class="ttl">記録を Notion に残す</span><span class="pg">20分</span></li>
+        <li><span class="no">6</span><span class="ttl">さらに強くする</span><span class="pg">任意</span></li>
+      </ol>
+    </nav>
   </header>
 
   <!-- ───────── STEP 0 ───────── -->
@@ -422,10 +480,10 @@
       </div>
 
       <ol class="flow">
-        <li><span>1</span>有料プランを契約する</li>
-        <li><span>2</span>Claude のアプリを入れる</li>
-        <li><span>3</span>Git for Windows を入れる</li>
-        <li><span>4</span>Code タブで作業フォルダを開く</li>
+        <li><span>0-1</span>有料プランを契約する</li>
+        <li><span>0-2</span>Claude のアプリを入れる</li>
+        <li><span>0-3</span>Git for Windows を入れる</li>
+        <li><span>0-4</span>Code タブで作業フォルダを開く</li>
       </ol>
 
       <section class="sect">
@@ -566,6 +624,12 @@
       <p class="aside-small">（完了した記事は番号が灰色になります）</p>
     </div></div></div>
   </article>
+
+  <div class="imprint">
+    <div class="big">The Claude Code Times</div>
+    <div>編集・発行 ／ eri</div>
+    <div>本紙は Windows 版 Claude Code の設定手順を伝えるために発行したものである</div>
+  </div>
 
   <p class="demo-note">
     ── これはデザイン確認用のデモです。STEP 0 の中身だけ本物を入れ、STEP 1・2 は見出しの見え方だけ置いています。
