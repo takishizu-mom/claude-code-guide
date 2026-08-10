@@ -24,68 +24,31 @@
     --code-bg: #1A1D25;
     --code-ink: #E4E6EA;
     --code-rule: #2E3340;
-    --shadow: 0 1px 2px rgba(20,23,28,.06), 0 8px 24px -16px rgba(20,23,28,.28);
+    --shadow: 0 1px 2px rgba(20,23,28,.05), 0 10px 28px -20px rgba(20,23,28,.3);
     --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
     --jp: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", "Yu Gothic", "Noto Sans JP", "Meiryo", system-ui, sans-serif;
+    --ease: cubic-bezier(.22,.75,.2,1);
   }
 
   @media (prefers-color-scheme: dark) {
     :root {
-      --paper: #0F1116;
-      --card: #171A21;
-      --ink: #E9EBEF;
-      --ink-2: #A8AEBB;
-      --ink-3: #767D8C;
-      --rule: #2A2F3A;
-      --rule-soft: #22262F;
-      --spot: #8098FF;
-      --spot-soft: #1B2140;
-      --spot-ink: #A9BAFF;
-      --warn: #E0A76A;
-      --warn-soft: #2A2118;
-      --code-bg: #0A0C11;
-      --code-ink: #DDE0E6;
-      --code-rule: #262B36;
-      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.9);
+      --paper: #0F1116; --card: #171A21; --ink: #E9EBEF; --ink-2: #A8AEBB; --ink-3: #767D8C;
+      --rule: #2A2F3A; --rule-soft: #22262F; --spot: #8098FF; --spot-soft: #1B2140; --spot-ink: #A9BAFF;
+      --warn: #E0A76A; --warn-soft: #2A2118; --code-bg: #0A0C11; --code-ink: #DDE0E6; --code-rule: #262B36;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -22px rgba(0,0,0,.9);
     }
   }
-
   :root[data-theme="dark"] {
-    --paper: #0F1116;
-    --card: #171A21;
-    --ink: #E9EBEF;
-    --ink-2: #A8AEBB;
-    --ink-3: #767D8C;
-    --rule: #2A2F3A;
-    --rule-soft: #22262F;
-    --spot: #8098FF;
-    --spot-soft: #1B2140;
-    --spot-ink: #A9BAFF;
-    --warn: #E0A76A;
-    --warn-soft: #2A2118;
-    --code-bg: #0A0C11;
-    --code-ink: #DDE0E6;
-    --code-rule: #262B36;
-    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.9);
+    --paper: #0F1116; --card: #171A21; --ink: #E9EBEF; --ink-2: #A8AEBB; --ink-3: #767D8C;
+    --rule: #2A2F3A; --rule-soft: #22262F; --spot: #8098FF; --spot-soft: #1B2140; --spot-ink: #A9BAFF;
+    --warn: #E0A76A; --warn-soft: #2A2118; --code-bg: #0A0C11; --code-ink: #DDE0E6; --code-rule: #262B36;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -22px rgba(0,0,0,.9);
   }
-
   :root[data-theme="light"] {
-    --paper: #F4F5F3;
-    --card: #FFFFFF;
-    --ink: #15171C;
-    --ink-2: #4A4F5A;
-    --ink-3: #7C828E;
-    --rule: #D9DCD8;
-    --rule-soft: #E7E9E5;
-    --spot: #2340C4;
-    --spot-soft: #E8EBFA;
-    --spot-ink: #1B32A0;
-    --warn: #A2521A;
-    --warn-soft: #F6EDE2;
-    --code-bg: #1A1D25;
-    --code-ink: #E4E6EA;
-    --code-rule: #2E3340;
-    --shadow: 0 1px 2px rgba(20,23,28,.06), 0 8px 24px -16px rgba(20,23,28,.28);
+    --paper: #F4F5F3; --card: #FFFFFF; --ink: #15171C; --ink-2: #4A4F5A; --ink-3: #7C828E;
+    --rule: #D9DCD8; --rule-soft: #E7E9E5; --spot: #2340C4; --spot-soft: #E8EBFA; --spot-ink: #1B32A0;
+    --warn: #A2521A; --warn-soft: #F6EDE2; --code-bg: #1A1D25; --code-ink: #E4E6EA; --code-rule: #2E3340;
+    --shadow: 0 1px 2px rgba(20,23,28,.05), 0 10px 28px -20px rgba(20,23,28,.3);
   }
 
   * { box-sizing: border-box; }
@@ -98,604 +61,374 @@
     font-size: 16px;
     line-height: 1.85;
     -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
   }
 
-  .wrap {
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 0 24px 96px;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0;
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 20px 80px; }
+
+  /* ---------- sticky progress ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--rule);
+    margin: 0 -20px 0;
+    padding: 0 20px;
+  }
+  .topbar-in {
+    max-width: 780px; margin: 0 auto;
+    display: flex; align-items: center; gap: 14px;
+    height: 52px;
+  }
+  .topbar .label {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
+    color: var(--ink-3); white-space: nowrap; font-weight: 700;
+  }
+  .track { flex: 1; height: 4px; background: var(--rule); border-radius: 2px; overflow: hidden; }
+  .track span {
+    display: block; height: 100%; width: 0%;
+    background: var(--spot); border-radius: 2px;
+    transition: width .5s var(--ease);
+  }
+  .count {
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    color: var(--spot); font-variant-numeric: tabular-nums; white-space: nowrap;
   }
 
   /* ---------- masthead ---------- */
-  .masthead {
-    padding: 72px 0 40px;
-    border-bottom: 2px solid var(--ink);
-  }
+  .masthead { padding: 56px 0 36px; }
   .eyebrow {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: .22em;
-    text-transform: uppercase;
-    color: var(--spot);
-    margin: 0 0 18px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--spot); margin: 0 0 16px;
   }
   h1 {
-    font-size: clamp(30px, 5.2vw, 50px);
-    line-height: 1.24;
-    letter-spacing: -.02em;
-    font-weight: 800;
-    margin: 0 0 18px;
-    text-wrap: balance;
+    font-size: clamp(27px, 5.6vw, 40px); line-height: 1.3; letter-spacing: -.02em;
+    font-weight: 800; margin: 0 0 16px; text-wrap: balance;
   }
-  .standfirst {
-    font-size: 17px;
-    color: var(--ink-2);
-    max-width: 62ch;
-    margin: 0 0 32px;
-  }
+  .standfirst { font-size: 16px; color: var(--ink-2); margin: 0 0 26px; }
   .specs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0;
-    border: 1px solid var(--rule);
-    border-radius: 3px;
-    overflow: hidden;
-    background: var(--card);
-    max-width: 760px;
+    display: flex; flex-wrap: wrap;
+    border: 1px solid var(--rule); border-radius: 4px;
+    overflow: hidden; background: var(--card);
   }
-  .spec {
-    flex: 1 1 170px;
-    padding: 14px 18px;
-    border-right: 1px solid var(--rule-soft);
-  }
+  .spec { flex: 1 1 140px; padding: 12px 16px; border-right: 1px solid var(--rule-soft); }
   .spec:last-child { border-right: 0; }
   .spec dt {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    color: var(--ink-3);
-    margin: 0 0 4px;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--ink-3); margin: 0 0 2px;
   }
-  .spec dd {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1.5;
-  }
+  .spec dd { margin: 0; font-size: 13.5px; font-weight: 700; line-height: 1.5; }
 
-  /* ---------- how to use ---------- */
   .howto {
-    margin: 40px 0 0;
-    background: var(--spot-soft);
-    border-left: 3px solid var(--spot);
-    border-radius: 0 3px 3px 0;
-    padding: 24px 28px;
+    margin: 28px 0 40px;
+    background: var(--spot-soft); border-left: 3px solid var(--spot);
+    border-radius: 0 4px 4px 0; padding: 20px 24px;
   }
-  .howto h2 {
-    margin: 0 0 14px;
-    font-size: 15px;
-    letter-spacing: .04em;
-    color: var(--spot-ink);
-  }
-  .howto ol {
-    margin: 0;
-    padding-left: 0;
-    list-style: none;
-    counter-reset: ht;
-    display: grid;
-    gap: 6px;
-  }
-  .howto li {
-    counter-increment: ht;
-    position: relative;
-    padding-left: 32px;
-    font-size: 15px;
-    color: var(--ink);
-  }
+  .howto h2 { margin: 0 0 12px; font-size: 14.5px; color: var(--spot-ink); }
+  .howto ol { margin: 0; padding: 0; list-style: none; counter-reset: ht; display: grid; gap: 5px; }
+  .howto li { counter-increment: ht; position: relative; padding-left: 30px; font-size: 14.5px; }
   .howto li::before {
-    content: counter(ht);
-    position: absolute;
-    left: 0; top: .38em;
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    background: var(--spot);
-    color: #fff;
-    font-family: var(--mono);
-    font-size: 11px;
-    line-height: 20px;
-    text-align: center;
-    font-weight: 700;
+    content: counter(ht); position: absolute; left: 0; top: .4em;
+    width: 19px; height: 19px; border-radius: 50%;
+    background: var(--spot); color: #fff;
+    font-family: var(--mono); font-size: 10.5px; line-height: 19px;
+    text-align: center; font-weight: 700;
   }
 
-  /* ---------- layout ---------- */
-  .body-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 48px;
-    margin-top: 56px;
-  }
-  @media (min-width: 1000px) {
-    .body-grid { grid-template-columns: 200px 1fr; gap: 64px; align-items: start; }
-  }
+  /* ---------- accordion ---------- */
+  .steps { display: grid; gap: 10px; }
 
-  nav.rail {
-    display: none;
-  }
-  @media (min-width: 1000px) {
-    nav.rail {
-      display: block;
-      position: sticky;
-      top: 32px;
-    }
-  }
-  .rail-title {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--ink-3);
-    margin: 0 0 14px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--rule);
-  }
-  .rail a {
-    display: grid;
-    grid-template-columns: 26px 1fr;
-    gap: 8px;
-    align-items: baseline;
-    padding: 7px 0;
-    color: var(--ink-2);
-    text-decoration: none;
-    font-size: 13.5px;
-    line-height: 1.4;
-    border-bottom: 1px solid var(--rule-soft);
-    transition: color .12s;
-  }
-  .rail a:last-of-type { border-bottom: 0; }
-  .rail a .n {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--ink-3);
-    font-weight: 700;
-  }
-  .rail a:hover { color: var(--spot); }
-  .rail a.done .n::after { content: "✓"; color: var(--spot); margin-left: 2px; }
-  .rail a.done { color: var(--ink-3); }
-  .rail-progress {
-    margin-top: 16px;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--ink-3);
-    letter-spacing: .06em;
-  }
-  .bar {
-    height: 3px;
-    background: var(--rule);
-    border-radius: 2px;
-    margin-top: 7px;
-    overflow: hidden;
-  }
-  .bar span {
-    display: block;
-    height: 100%;
-    background: var(--spot);
-    width: 0%;
-    transition: width .3s ease;
-  }
-
-  main { min-width: 0; }
-
-  /* ---------- step ---------- */
   .step {
     background: var(--card);
     border: 1px solid var(--rule);
-    border-radius: 4px;
-    padding: 32px 32px 36px;
-    margin-bottom: 32px;
+    border-radius: 6px;
     box-shadow: var(--shadow);
-    scroll-margin-top: 24px;
+    scroll-margin-top: 62px;
+    transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
   }
-  @media (max-width: 640px) {
-    .step { padding: 24px 20px 28px; }
-  }
-  .step-head {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 16px;
-    align-items: start;
-    padding-bottom: 20px;
-    margin-bottom: 24px;
-    border-bottom: 1px solid var(--rule-soft);
-  }
-  .step-num {
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: .1em;
-    color: #fff;
-    background: var(--ink);
-    padding: 5px 9px;
-    border-radius: 3px;
-    white-space: nowrap;
-    margin-top: 4px;
-  }
-  .step.optional .step-num { background: var(--ink-3); }
-  .step h2 {
-    margin: 0;
-    font-size: clamp(20px, 3.2vw, 25px);
-    line-height: 1.4;
-    letter-spacing: -.01em;
-    font-weight: 800;
-    text-wrap: balance;
-  }
-  .step h2 .time {
-    display: block;
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: .1em;
-    color: var(--ink-3);
-    margin-top: 6px;
-  }
-  .check {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: .06em;
-    color: var(--ink-3);
-    background: transparent;
-    border: 1px solid var(--rule);
-    border-radius: 999px;
-    padding: 6px 12px;
-    cursor: pointer;
-    white-space: nowrap;
-    font-weight: 600;
-  }
-  .check:hover { border-color: var(--spot); color: var(--spot); }
-  .check .box {
-    width: 12px; height: 12px;
-    border: 1.5px solid currentColor;
-    border-radius: 2px;
-    display: inline-block;
-  }
-  .check[aria-pressed="true"] {
-    background: var(--spot);
-    border-color: var(--spot);
-    color: #fff;
-  }
-  .check[aria-pressed="true"] .box { background: #fff; border-color: #fff; }
-  .step.is-done { opacity: .74; }
-  .step.is-done:hover { opacity: 1; }
+  .step.open { border-color: color-mix(in srgb, var(--spot) 45%, var(--rule)); }
 
-  .lede {
-    font-size: 16px;
-    color: var(--ink-2);
-    margin: 0 0 24px;
-    max-width: 64ch;
+  .step-head {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 46px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 18px 20px;
+    background: none;
+    border: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 6px;
   }
-  .lede strong { color: var(--ink); }
+  .step-head:hover .st-title { color: var(--spot); }
+
+  .st-num {
+    font-family: var(--mono); font-size: 11.5px; font-weight: 700; letter-spacing: .06em;
+    color: #fff; background: var(--ink);
+    border-radius: 4px; padding: 5px 0; text-align: center;
+    transition: background .3s var(--ease);
+  }
+  .step.optional .st-num { background: var(--ink-3); }
+  .step.done .st-num { background: var(--spot); }
+
+  .st-title {
+    font-size: 17px; font-weight: 800; line-height: 1.45;
+    letter-spacing: -.005em;
+    transition: color .2s var(--ease);
+  }
+  .st-title small {
+    display: block;
+    font-family: var(--mono); font-size: 10.5px; font-weight: 500;
+    letter-spacing: .08em; color: var(--ink-3); margin-top: 3px;
+  }
+  .step.done .st-title { color: var(--ink-3); }
+
+  .st-mark { display: flex; align-items: center; gap: 10px; }
+  .st-check {
+    width: 20px; height: 20px; flex: none;
+    opacity: 0; transform: scale(.6);
+    transition: opacity .3s var(--ease), transform .35s var(--ease);
+  }
+  .step.done .st-check { opacity: 1; transform: scale(1); }
+  .st-check circle { fill: var(--spot); }
+  .st-check path {
+    stroke: #fff; stroke-width: 2.2; fill: none;
+    stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 16; stroke-dashoffset: 16;
+    transition: stroke-dashoffset .4s var(--ease) .1s;
+  }
+  .step.done .st-check path { stroke-dashoffset: 0; }
+  .chev {
+    width: 12px; height: 12px; flex: none;
+    border-right: 2px solid var(--ink-3);
+    border-bottom: 2px solid var(--ink-3);
+    transform: rotate(45deg) translate(-2px,-2px);
+    transition: transform .32s var(--ease), border-color .2s;
+  }
+  .step.open .chev {
+    transform: rotate(-135deg) translate(-3px,-3px);
+    border-color: var(--spot);
+  }
+
+  .step-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .38s var(--ease);
+  }
+  .step.open .step-body { grid-template-rows: 1fr; }
+  .step-body > div { overflow: hidden; }
+  .body-in {
+    padding: 4px 24px 26px;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity .3s var(--ease) .08s, transform .3s var(--ease) .08s;
+  }
+  .step.open .body-in { opacity: 1; transform: none; }
+  @media (max-width: 560px) {
+    .step-head { padding: 16px; grid-template-columns: 42px 1fr auto; gap: 11px; }
+    .st-title { font-size: 15.5px; }
+    .body-in { padding: 4px 16px 22px; }
+  }
+
+  /* ---------- body content ---------- */
+  .lede { font-size: 15.5px; color: var(--ink-2); margin: 0 0 20px; }
+  .lede strong, p strong { color: var(--ink); }
 
   h3 {
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: .01em;
-    margin: 32px 0 12px;
-    padding-left: 12px;
-    border-left: 3px solid var(--spot);
-    line-height: 1.5;
+    font-size: 14.5px; font-weight: 800; margin: 26px 0 11px;
+    padding-left: 11px; border-left: 3px solid var(--spot); line-height: 1.5;
   }
-  h3:first-of-type { margin-top: 0; }
-
-  p { margin: 0 0 14px; max-width: 66ch; }
+  h3:first-child { margin-top: 0; }
+  p { margin: 0 0 13px; }
   a { color: var(--spot); text-underline-offset: 3px; }
 
-  ul.plain { margin: 0 0 18px; padding-left: 20px; }
-  ul.plain li { margin-bottom: 6px; max-width: 62ch; }
+  ul.plain { margin: 0 0 16px; padding-left: 19px; }
+  ul.plain li { margin-bottom: 5px; }
 
-  ol.numbered {
-    margin: 0 0 18px;
-    padding-left: 0;
-    list-style: none;
-    counter-reset: ni;
-  }
+  ol.numbered { margin: 0 0 16px; padding: 0; list-style: none; counter-reset: ni; }
   ol.numbered li {
-    counter-increment: ni;
-    position: relative;
-    padding-left: 28px;
-    margin-bottom: 8px;
-    max-width: 62ch;
+    counter-increment: ni; position: relative; padding-left: 27px; margin-bottom: 7px;
   }
   ol.numbered li::before {
-    content: counter(ni) ".";
-    position: absolute; left: 0;
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--spot);
-    top: .3em;
+    content: counter(ni) "."; position: absolute; left: 0; top: .28em;
+    font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--spot);
   }
 
-  /* ---------- term note ---------- */
   .term {
-    background: var(--paper);
-    border: 1px dashed var(--rule);
-    border-radius: 3px;
-    padding: 14px 18px;
-    margin: 0 0 20px;
-    font-size: 14.5px;
-    color: var(--ink-2);
+    background: var(--paper); border: 1px dashed var(--rule); border-radius: 4px;
+    padding: 13px 17px; margin: 0 0 18px; font-size: 14px; color: var(--ink-2);
   }
   .term b {
-    display: block;
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    color: var(--ink-3);
-    margin-bottom: 5px;
-    font-weight: 700;
+    display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--ink-3); margin-bottom: 4px; font-weight: 700;
   }
-  .term p { margin: 0 0 4px; max-width: none; }
+  .term p { margin: 0 0 4px; }
   .term p:last-child { margin-bottom: 0; }
-  .term code { font-weight: 700; color: var(--ink); }
+  .term code, p code, li code, td code {
+    font-family: var(--mono); font-size: 12.5px;
+    background: var(--spot-soft); color: var(--spot-ink);
+    padding: 1px 6px; border-radius: 3px; font-weight: 700;
+  }
 
-  /* ---------- copy block ---------- */
+  /* ---------- paste block ---------- */
   .paste {
-    margin: 0 0 22px;
-    border-radius: 4px;
-    overflow: hidden;
-    border: 1px solid var(--code-rule);
-    background: var(--code-bg);
+    margin: 0 0 20px; border-radius: 5px; overflow: hidden;
+    border: 1px solid var(--code-rule); background: var(--code-bg);
   }
   .paste-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 9px 12px 9px 14px;
-    background: rgba(255,255,255,.045);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 9px 11px 9px 14px;
+    background: rgba(255,255,255,.05);
     border-bottom: 1px solid var(--code-rule);
   }
   .paste-label {
-    font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    color: #9BA3B4;
-    font-weight: 700;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .15em;
+    text-transform: uppercase; color: #9BA3B4; font-weight: 700;
   }
   .copy-btn {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .08em;
-    color: #0F1116;
-    background: #E4E6EA;
-    border: 0;
-    border-radius: 3px;
-    padding: 6px 13px;
-    cursor: pointer;
-    transition: background .12s, color .12s;
+    font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    color: #0F1116; background: #E4E6EA; border: 0; border-radius: 4px;
+    padding: 6px 13px; cursor: pointer;
+    transition: background .15s, color .15s, transform .15s var(--ease);
   }
-  .copy-btn:hover { background: #fff; }
+  .copy-btn:hover { background: #fff; transform: translateY(-1px); }
+  .copy-btn:active { transform: translateY(0); }
   .copy-btn.copied { background: var(--spot); color: #fff; }
   .paste pre {
-    margin: 0;
-    cursor: text;
-    padding: 18px 20px;
-    overflow-x: auto;
-    color: var(--code-ink);
-    font-family: var(--mono);
-    font-size: 13px;
-    line-height: 1.8;
-    white-space: pre-wrap;
-    word-break: break-word;
-    tab-size: 2;
-  }
-  .paste.long pre {
-    max-height: 340px;
-    overflow-y: auto;
+    margin: 0; padding: 16px 18px; overflow: auto; cursor: text;
+    color: var(--code-ink); font-family: var(--mono);
+    font-size: 12.5px; line-height: 1.75;
+    white-space: pre-wrap; word-break: break-word;
+    max-height: 300px;
   }
   .paste-foot {
-    padding: 8px 14px;
-    border-top: 1px solid var(--code-rule);
-    font-family: var(--mono);
-    font-size: 10.5px;
-    color: #767D8C;
-    letter-spacing: .06em;
+    padding: 8px 14px; border-top: 1px solid var(--code-rule);
+    font-family: var(--mono); font-size: 10.5px; color: #767D8C; letter-spacing: .05em;
   }
 
-  /* ---------- confirm / warn ---------- */
-  .confirm, .warnbox {
-    border-radius: 3px;
-    padding: 16px 20px;
-    margin: 0 0 20px;
-    font-size: 15px;
-  }
-  .confirm {
-    background: var(--spot-soft);
-    border-left: 3px solid var(--spot);
-    color: var(--ink);
-  }
-  .warnbox {
-    background: var(--warn-soft);
-    border-left: 3px solid var(--warn);
-    color: var(--ink);
-  }
+  .confirm, .warnbox { border-radius: 4px; padding: 14px 18px; margin: 0 0 18px; font-size: 14.5px; }
+  .confirm { background: var(--spot-soft); border-left: 3px solid var(--spot); }
+  .warnbox { background: var(--warn-soft); border-left: 3px solid var(--warn); }
   .confirm b, .warnbox b {
-    display: block;
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-    font-weight: 700;
+    display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .16em;
+    text-transform: uppercase; margin-bottom: 5px; font-weight: 700;
   }
   .confirm b { color: var(--spot-ink); }
   .warnbox b { color: var(--warn); }
-  .confirm p, .warnbox p { margin: 0; max-width: none; }
+  .confirm p, .warnbox p { margin: 0; }
 
-  /* ---------- table ---------- */
-  .tablewrap { overflow-x: auto; margin: 0 0 22px; }
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    min-width: 480px;
-    font-size: 14.5px;
-  }
-  th, td {
-    text-align: left;
-    padding: 11px 14px;
-    border-bottom: 1px solid var(--rule-soft);
-    vertical-align: top;
-  }
+  .tablewrap { overflow-x: auto; margin: 0 0 20px; }
+  table { border-collapse: collapse; width: 100%; min-width: 440px; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 13px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
   thead th {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--ink-3);
-    border-bottom: 1px solid var(--rule);
-    font-weight: 700;
-    white-space: nowrap;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--ink-3); border-bottom: 1px solid var(--rule); font-weight: 700; white-space: nowrap;
   }
   tbody tr:last-child td { border-bottom: 0; }
-  td code, th code {
-    font-family: var(--mono);
-    font-size: 12.5px;
-    background: var(--spot-soft);
-    color: var(--spot-ink);
-    padding: 2px 6px;
-    border-radius: 3px;
-    white-space: nowrap;
-    font-weight: 700;
-  }
   .mini-copy {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: .08em;
-    font-weight: 700;
-    color: var(--spot);
-    background: transparent;
-    border: 1px solid var(--rule);
-    border-radius: 3px;
-    padding: 4px 9px;
-    cursor: pointer;
-    white-space: nowrap;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .06em; font-weight: 700;
+    color: var(--spot); background: transparent; border: 1px solid var(--rule);
+    border-radius: 4px; padding: 4px 9px; cursor: pointer; white-space: nowrap;
+    transition: background .15s, color .15s, border-color .15s;
   }
   .mini-copy:hover { border-color: var(--spot); }
   .mini-copy.copied { background: var(--spot); color: #fff; border-color: var(--spot); }
 
-  /* ---------- closing ---------- */
-  .closing {
-    margin-top: 8px;
-    border-top: 2px solid var(--ink);
-    padding-top: 40px;
+  /* ---------- next button ---------- */
+  .stepfoot {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--rule-soft);
   }
+  .next-btn {
+    font-family: inherit; font-size: 14.5px; font-weight: 800;
+    color: #fff; background: var(--spot); border: 0; border-radius: 6px;
+    padding: 12px 22px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 9px;
+    transition: transform .18s var(--ease), filter .18s;
+  }
+  .next-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .next-btn:active { transform: translateY(0); }
+  .next-btn .arw { transition: transform .25s var(--ease); }
+  .next-btn:hover .arw { transform: translateX(3px); }
+  .undo-btn {
+    font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .05em;
+    background: transparent; border: 1px solid var(--rule); color: var(--ink-3);
+    border-radius: 6px; padding: 10px 14px; cursor: pointer;
+  }
+  .undo-btn:hover { border-color: var(--ink-3); color: var(--ink); }
+
+  /* ---------- closing ---------- */
+  .closing { margin-top: 48px; border-top: 2px solid var(--ink); padding-top: 36px; }
   .thesis {
-    font-size: clamp(20px, 3.4vw, 27px);
-    font-weight: 800;
-    line-height: 1.5;
-    letter-spacing: -.01em;
-    margin: 0 0 28px;
-    max-width: 22ch;
-    text-wrap: balance;
+    font-size: clamp(19px, 4.2vw, 25px); font-weight: 800; line-height: 1.55;
+    letter-spacing: -.01em; margin: 0 0 26px; max-width: 22ch; text-wrap: balance;
   }
   .thesis em { font-style: normal; color: var(--spot); }
-  .recap {
-    display: grid;
-    gap: 0;
-    border-top: 1px solid var(--rule);
-  }
+  .recap { border-top: 1px solid var(--rule); }
   .recap div {
-    display: grid;
-    grid-template-columns: 74px 1fr;
-    gap: 16px;
-    padding: 13px 0;
-    border-bottom: 1px solid var(--rule-soft);
-    font-size: 14.5px;
-    align-items: baseline;
+    display: grid; grid-template-columns: 72px 1fr; gap: 14px;
+    padding: 12px 0; border-bottom: 1px solid var(--rule-soft);
+    font-size: 14px; align-items: baseline;
   }
   .recap span {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: .1em;
-    color: var(--spot);
-    font-weight: 700;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
+    color: var(--spot); font-weight: 700;
   }
-  .colophon {
-    margin-top: 36px;
-    font-size: 13px;
-    color: var(--ink-3);
-    line-height: 1.8;
-  }
+  .colophon { margin-top: 30px; font-size: 12.5px; color: var(--ink-3); line-height: 1.8; }
 
-  :focus-visible {
-    outline: 2px solid var(--spot);
-    outline-offset: 2px;
-    border-radius: 2px;
-  }
+  :focus-visible { outline: 2px solid var(--spot); outline-offset: 2px; border-radius: 3px; }
+
   @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; }
+    *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
   }
 </style>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <span class="label">進捗</span>
+    <span class="track"><span id="pbar"></span></span>
+    <span class="count" id="pcount">0 / 8</span>
+  </div>
+</div>
 
 <div class="wrap">
 
   <header class="masthead">
     <p class="eyebrow">Setup Guide / Windows</p>
     <h1>Claude Code を<br>「自分専用の開発チーム」にする手順書</h1>
-    <p class="standfirst">上から順にコピペしていくだけで完成します。プログラミングの知識は要りません。STEP&nbsp;1 と STEP&nbsp;3 まで終われば、AI との作業はかなり楽になります。</p>
+    <p class="standfirst">上から順にコピペしていくだけで完成します。プログラミングの知識は要りません。</p>
     <dl class="specs">
       <div class="spec"><dt>対象</dt><dd>Windows・非エンジニア</dd></div>
       <div class="spec"><dt>所要時間</dt><dd>STEP 0–3 で約1時間</dd></div>
-      <div class="spec"><dt>必要なもの</dt><dd>Claude Pro 以上（月20ドル）</dd></div>
-      <div class="spec"><dt>STEP</dt><dd>0 → 6（4以降は任意）</dd></div>
+      <div class="spec"><dt>必要なもの</dt><dd>Claude Pro 以上</dd></div>
       <div class="spec"><dt>作成</dt><dd>eri</dd></div>
     </dl>
 
     <div class="howto">
-      <h2>この手順書の使い方</h2>
+      <h2>使い方</h2>
       <ol>
-        <li>黒い枠の「コピー」ボタンを押す</li>
-        <li>Claude Code の入力欄に貼り付けて Enter</li>
-        <li>Claude が聞いてきたら答える／「はい」と承認する</li>
+        <li>見出しを押すと、そのステップだけ開きます</li>
+        <li>黒い枠の「コピー」を押して、Claude Code に貼り付け</li>
+        <li>終わったら「完了！次へ」を押す。次が自動で開きます</li>
       </ol>
     </div>
   </header>
 
-  <div class="body-grid">
+  <div class="steps">
 
-    <nav class="rail" aria-label="ステップ一覧">
-      <p class="rail-title">Steps</p>
-      <a href="#step0"><span class="n">00</span><span>準備</span></a>
-      <a href="#step1"><span class="n">01</span><span>取扱説明書</span></a>
-      <a href="#step2"><span class="n">02</span><span>担当者3人</span></a>
-      <a href="#step3"><span class="n">03</span><span>安全装置</span></a>
-      <a href="#step4"><span class="n">04</span><span>専用コマンド</span></a>
-      <a href="#step5"><span class="n">05</span><span>Notion 記録</span></a>
-      <a href="#step6"><span class="n">06</span><span>拡張（任意）</span></a>
-      <a href="#final"><span class="n">✔</span><span>最終チェック</span></a>
-      <p class="rail-progress"><span id="progress-text">0 / 7 完了</span></p>
-      <div class="bar"><span id="progress-bar"></span></div>
-    </nav>
-
-    <main>
-
-      <!-- STEP 0 -->
-      <section class="step" id="step0">
-        <div class="step-head">
-          <span class="step-num">STEP 00</span>
-          <h2>準備（インストールとログイン）<span class="time">約 20 分</span></h2>
-          <button class="check" data-step="0" aria-pressed="false"><span class="box"></span>完了</button>
-        </div>
+    <!-- STEP 0 -->
+    <section class="step" id="step0">
+      <button class="step-head" aria-expanded="false" aria-controls="b0">
+        <span class="st-num">00</span>
+        <span class="st-title">準備（インストールとログイン）<small>約 20 分</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b0"><div><div class="body-in">
 
         <h3>0-1. 有料プランに入る</h3>
         <p>Claude Code は<strong>無料プランでは使えません</strong>。Pro（月20ドル）以上が必要です。</p>
@@ -726,42 +459,36 @@
 
         <h3>0-4. 動くか確認する</h3>
         <p>Claude Code を起動して、下の枠を貼り付けてください。</p>
-
         <div class="paste">
-          <div class="paste-bar">
-            <span class="paste-label">貼り付ける</span>
-            <button class="copy-btn">コピー</button>
-          </div>
+          <div class="paste-bar"><span class="paste-label">貼り付ける</span><button class="copy-btn">コピー</button></div>
           <pre>自己紹介と、今このパソコンで何ができるかを3行で教えてください。
 あと、私のホームフォルダの場所（C:\Users\〜）も教えてください。</pre>
         </div>
+        <div class="confirm"><b>ここまでできたら</b><p>返事が返ってきたら準備完了です。</p></div>
 
-        <div class="confirm">
-          <b>ここまでできたら</b>
-          <p>返事が返ってきたら準備完了です。</p>
-        </div>
-      </section>
+      </div></div></div>
+    </section>
 
-      <!-- STEP 1 -->
-      <section class="step" id="step1">
-        <div class="step-head">
-          <span class="step-num">STEP 01</span>
-          <h2>自分専用の取扱説明書をつくる<span class="time">CLAUDE.md ／ 約 15 分</span></h2>
-          <button class="check" data-step="1" aria-pressed="false"><span class="box"></span>完了</button>
-        </div>
+    <!-- STEP 1 -->
+    <section class="step" id="step1">
+      <button class="step-head" aria-expanded="false" aria-controls="b1">
+        <span class="st-num">01</span>
+        <span class="st-title">自分専用の取扱説明書をつくる<small>CLAUDE.md ／ 約 15 分</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b1"><div><div class="body-in">
 
         <p class="lede"><strong>ここが一番大事です。</strong>これを作らないと、AI は毎回あなたの好みを忘れます。逆にここさえ作れば、「私は非エンジニアです」「勝手に大改造しないで」を毎回言わなくて済みます。</p>
-
         <div class="term">
           <b>用語メモ</b>
-          <p><code>CLAUDE.md</code>＝AI が毎回いちばん最初に読む「あなたの取扱説明書」。ルールをここに書いておけば、新しい会話を始めても覚えていてくれます。</p>
+          <p><code>CLAUDE.md</code>＝AI が毎回いちばん最初に読む「あなたの取扱説明書」。新しい会話を始めても覚えていてくれます。</p>
         </div>
 
-        <div class="paste long">
-          <div class="paste-bar">
-            <span class="paste-label">貼り付ける</span>
-            <button class="copy-btn">コピー</button>
-          </div>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける</span><button class="copy-btn">コピー</button></div>
           <pre>これから、私専用の CLAUDE.md（＝あなたが毎回最初に読む「私の取扱説明書」）を一緒に作ります。
 
 【あなたへのお願い】
@@ -788,22 +515,24 @@ CLAUDE.md という名前で保存してください（例：C:\Users\自分の�
           <div class="paste-foot">Claude が1問ずつ質問してきます。思いつくままに答えて大丈夫です。</div>
         </div>
 
-        <div class="confirm">
-          <b>ここまでできたら</b>
-          <p><code>.claude</code> フォルダの中に <code>CLAUDE.md</code> ができていれば OK。見せてもらった中身に違うところがあれば「ここをこう直して」と言えば直してくれます。</p>
-        </div>
-      </section>
+        <div class="confirm"><b>ここまでできたら</b><p><code>.claude</code> フォルダの中に <code>CLAUDE.md</code> ができていれば OK。違うところがあれば「ここをこう直して」と言えば直してくれます。</p></div>
 
-      <!-- STEP 2 -->
-      <section class="step" id="step2">
-        <div class="step-head">
-          <span class="step-num">STEP 02</span>
-          <h2>担当者を3人つくる<span class="time">サブエージェント ／ 約 5 分</span></h2>
-          <button class="check" data-step="2" aria-pressed="false"><span class="box"></span>完了</button>
-        </div>
+      </div></div></div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="step" id="step2">
+      <button class="step-head" aria-expanded="false" aria-controls="b2">
+        <span class="st-num">02</span>
+        <span class="st-title">担当者を3人つくる<small>サブエージェント ／ 約 5 分</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b2"><div><div class="body-in">
 
         <p class="lede">AI 1体に全部やらせると、設計しながら実装して、<strong>自分で自分の仕事を採点する</strong>状態になります。役割を分けると精度が上がります。</p>
-
         <div class="term">
           <b>用語メモ</b>
           <p><code>サブエージェント</code>＝本体の AI が呼び出せる「別の担当者 AI」。専門ごとに性格と権限を変えられます。</p>
@@ -820,11 +549,8 @@ CLAUDE.md という名前で保存してください（例：C:\Users\自分の�
           </table>
         </div>
 
-        <div class="paste long">
-          <div class="paste-bar">
-            <span class="paste-label">貼り付ける ①</span>
-            <button class="copy-btn">コピー</button>
-          </div>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける ①</span><button class="copy-btn">コピー</button></div>
           <pre>サブエージェント（＝役割ごとの担当AI）を3体つくってください。
 ホームフォルダの .claude\agents\ の中に、下の3ファイルをそのままの内容で作ってください。
 （例：C:\Users\自分の名前\.claude\agents\implementer.md）
@@ -910,45 +636,41 @@ tools: Read, Grep, Glob, Bash
         </div>
 
         <div class="paste">
-          <div class="paste-bar">
-            <span class="paste-label">貼り付ける ② 動作テスト</span>
-            <button class="copy-btn">コピー</button>
-          </div>
+          <div class="paste-bar"><span class="paste-label">貼り付ける ② 動作テスト</span><button class="copy-btn">コピー</button></div>
           <pre>investigator（調査係）を呼んで、私の .claude フォルダの中に
 今どんなファイルがあるか調べて報告させてください。</pre>
         </div>
 
-        <div class="confirm">
-          <b>ここまでできたら</b>
-          <p>調査係が呼び出されて、フォルダの中身を報告してくれれば OK です。</p>
-        </div>
-      </section>
+        <div class="confirm"><b>ここまでできたら</b><p>調査係が呼び出されて、フォルダの中身を報告してくれれば OK です。</p></div>
 
-      <!-- STEP 3 -->
-      <section class="step" id="step3">
-        <div class="step-head">
-          <span class="step-num">STEP 03</span>
-          <h2>安全装置をつける<span class="time">フック ／ 約 20 分</span></h2>
-          <button class="check" data-step="3" aria-pressed="false"><span class="box"></span>完了</button>
-        </div>
+      </div></div></div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="step" id="step3">
+      <button class="step-head" aria-expanded="false" aria-controls="b3">
+        <span class="st-num">03</span>
+        <span class="st-title">安全装置をつける<small>フック ／ 約 20 分</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b3"><div><div class="body-in">
 
         <p class="lede">STEP 2 で担当者を作っても、<strong>AI は面倒になると自分で全部やってしまいます。</strong>それを「お願い」ではなく「仕組み」で止めるのが、この STEP です。</p>
-
         <div class="term">
           <b>用語メモ</b>
-          <p><code>フック</code>＝AI が何か操作をする直前に自動で走る「見張り番プログラム」。ルール違反なら操作そのものをブロックできます。AI のお願いではなく強制なので、確実に効きます。</p>
+          <p><code>フック</code>＝AI が何か操作をする直前に自動で走る「見張り番プログラム」。ルール違反なら操作そのものをブロックできます。お願いではなく強制なので、確実に効きます。</p>
         </div>
 
         <ul class="plain">
-          <li><strong>① 直接実装ブロック</strong> — 高性能モデル（Opus）で会話しているときは、本体がコードを直接書けなくなる。必ず implementer に任せることになる</li>
+          <li><strong>① 直接実装ブロック</strong> — 高性能モデル（Opus）で会話しているときは、本体がコードを直接書けなくなる</li>
           <li><strong>② 承認ゲート</strong> — implementer を動かす前に、あなたの「実装して」という承認を必ず挟む</li>
         </ul>
 
-        <div class="paste long">
-          <div class="paste-bar">
-            <span class="paste-label">貼り付ける</span>
-            <button class="copy-btn">コピー</button>
-          </div>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける</span><button class="copy-btn">コピー</button></div>
           <pre>Claude Code のフック（＝操作の直前に自動で走る見張り番）を設定してください。
 私のパソコンは Windows です。Git for Windows は入れてあります。
 
@@ -984,22 +706,24 @@ C. 逃し道も用意する。どうしても自分で直接書きたい日は
 テストしていない状態で「できました」と言わないでください。</pre>
         </div>
 
-        <div class="confirm">
-          <b>ここまでできたら</b>
-          <p>Claude が「テストしたらブロックされました」と<strong>実際の画面</strong>を見せてくれれば OK。効いていなければ「効いていません。もう一度原因を調べて直してください」と伝えれば直します。</p>
-        </div>
-      </section>
+        <div class="confirm"><b>ここまでできたら</b><p>Claude が「テストしたらブロックされました」と<strong>実際の画面</strong>を見せてくれれば OK。効いていなければ「効いていません。原因を調べて直してください」と伝えれば直します。</p></div>
 
-      <!-- STEP 4 -->
-      <section class="step" id="step4">
-        <div class="step-head">
-          <span class="step-num">STEP 04</span>
-          <h2>自分専用コマンドをつくる<span class="time">スキル ／ 約 10 分</span></h2>
-          <button class="check" data-step="4" aria-pressed="false"><span class="box"></span>完了</button>
-        </div>
+      </div></div></div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section class="step" id="step4">
+      <button class="step-head" aria-expanded="false" aria-controls="b4">
+        <span class="st-num">04</span>
+        <span class="st-title">自分専用コマンドをつくる<small>スキル ／ 約 10 分</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b4"><div><div class="body-in">
 
         <p class="lede"><code>/</code> から始まる自分だけのコマンドを作れます。よく使う手順を、毎回説明せずに済みます。</p>
-
         <div class="term">
           <b>用語メモ</b>
           <p><code>スキル（スラッシュコマンド）</code>＝「この合言葉を言われたら、この手順でやってね」を登録しておく仕組み。</p>
@@ -1017,11 +741,8 @@ C. 逃し道も用意する。どうしても自分で直接書きたい日は
           </table>
         </div>
 
-        <div class="paste long">
-          <div class="paste-bar">
-            <span class="paste-label">貼り付ける</span>
-            <button class="copy-btn">コピー</button>
-          </div>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける</span><button class="copy-btn">コピー</button></div>
           <pre>私専用のスキル（＝/ から始まる自分だけのコマンド）を4つ作ってください。
 ホームフォルダの .claude\skills\ の中に、コマンド名のフォルダを作り、
 その中に SKILL.md を置く形でお願いします。
@@ -1050,22 +771,24 @@ C. 逃し道も用意する。どうしても自分で直接書きたい日は
 4つできたら、一覧と使い方を教えてください。</pre>
         </div>
 
-        <div class="confirm">
-          <b>ここまでできたら</b>
-          <p>入力欄に <code>/</code> と打って、作った4つが候補に出てくれば OK です。</p>
-        </div>
-      </section>
+        <div class="confirm"><b>ここまでできたら</b><p>入力欄に <code>/</code> と打って、作った4つが候補に出てくれば OK です。</p></div>
 
-      <!-- STEP 5 -->
-      <section class="step" id="step5">
-        <div class="step-head">
-          <span class="step-num">STEP 05</span>
-          <h2>記録を Notion に残す<span class="time">連携 ／ 約 20 分</span></h2>
-          <button class="check" data-step="5" aria-pressed="false"><span class="box"></span>完了</button>
-        </div>
+      </div></div></div>
+    </section>
+
+    <!-- STEP 5 -->
+    <section class="step" id="step5">
+      <button class="step-head" aria-expanded="false" aria-controls="b5">
+        <span class="st-num">05</span>
+        <span class="st-title">記録を Notion に残す<small>連携 ／ 約 20 分</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b5"><div><div class="body-in">
 
         <p class="lede">記録が手元のファイルだけだと、あとで探せません。Notion に自動で残るようにします。</p>
-
         <div class="term">
           <b>用語メモ</b>
           <p><code>MCP</code>＝Claude が外部サービス（Notion・GitHub など）と直接やりとりするための接続口。</p>
@@ -1081,25 +804,17 @@ C. 逃し道も用意する。どうしても自分で直接書きたい日は
         </ol>
 
         <h3>5-2. Claude と Notion をつなぐ</h3>
-        <p>Claude Code の設定画面で <strong>Connectors／MCP</strong> を開き、Notion を追加して「許可する」を押します。どこにあるか分からなければ、これを貼ってください。</p>
-
+        <p>設定画面で <strong>Connectors／MCP</strong> を開き、Notion を追加して「許可する」を押します。分からなければ、これを貼ってください。</p>
         <div class="paste">
-          <div class="paste-bar">
-            <span class="paste-label">貼り付ける ①</span>
-            <button class="copy-btn">コピー</button>
-          </div>
+          <div class="paste-bar"><span class="paste-label">貼り付ける ①</span><button class="copy-btn">コピー</button></div>
           <pre>Claude Code に Notion を接続したいです。
 私の環境（Windows・デスクトップアプリ）で、どの画面のどこをクリックすればいいか、
 「① 〜をクリック ② 〜を選ぶ」の形で、省略せずに手順を教えてください。</pre>
         </div>
 
         <h3>5-3. 記録先を Notion に切り替える</h3>
-
         <div class="paste">
-          <div class="paste-bar">
-            <span class="paste-label">貼り付ける ②</span>
-            <button class="copy-btn">コピー</button>
-          </div>
+          <div class="paste-bar"><span class="paste-label">貼り付ける ②</span><button class="copy-btn">コピー</button></div>
           <pre>Notion に接続できました。
 STEP 4 で作った session-log スキルの保存先を、ローカルのファイルから Notion に変更してください。
 
@@ -1111,30 +826,29 @@ STEP 4 で作った session-log スキルの保存先を、ローカルのファ
 そのページのリンクを見せてください。</pre>
         </div>
 
-        <div class="confirm">
-          <b>ここまでできたら</b>
-          <p>Notion を開いて「作業ログ」の中にテストページができていれば OK です。</p>
-        </div>
-      </section>
+        <div class="confirm"><b>ここまでできたら</b><p>Notion の「作業ログ」の中にテストページができていれば OK です。</p></div>
 
-      <!-- STEP 6 -->
-      <section class="step optional" id="step6">
-        <div class="step-head">
-          <span class="step-num">STEP 06</span>
-          <h2>さらに強くする<span class="time">任意 ／ 余裕ができてからで OK</span></h2>
-          <button class="check" data-step="6" aria-pressed="false"><span class="box"></span>完了</button>
-        </div>
+      </div></div></div>
+    </section>
+
+    <!-- STEP 6 -->
+    <section class="step optional" id="step6">
+      <button class="step-head" aria-expanded="false" aria-controls="b6">
+        <span class="st-num">06</span>
+        <span class="st-title">さらに強くする<small>任意 ／ 余裕ができてから</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b6"><div><div class="body-in">
 
         <p class="lede">ここから先は無くても困りません。<strong>STEP 5 まででいったん完成</strong>です。</p>
 
         <h3>6-A. AI 二刀流（Claude と ChatGPT に議論させる）</h3>
-        <p>正解のないテーマ（企画・方針）を、別の AI とぶつけて多角的に検討させる仕組みです。ChatGPT Plus 以上の契約が必要です。</p>
-
-        <div class="paste long">
-          <div class="paste-bar">
-            <span class="paste-label">貼り付ける</span>
-            <button class="copy-btn">コピー</button>
-          </div>
+        <p>正解のないテーマを、別の AI とぶつけて多角的に検討させる仕組みです。ChatGPT Plus 以上の契約が必要です。</p>
+        <div class="paste">
+          <div class="paste-bar"><span class="paste-label">貼り付ける</span><button class="copy-btn">コピー</button></div>
           <pre>Claude Code から Codex（＝OpenAI のコマンド版 ChatGPT）を呼び出せるようにしたいです。
 私は Windows・非エンジニアです。次の順で、省略せずに案内してください。
 
@@ -1156,34 +870,32 @@ STEP 4 で作った session-log スキルの保存先を、ローカルのファ
 
         <h3>6-B. ブラウザ操作（Claude in Chrome）</h3>
         <p>Claude が Chrome を見て操作できるようになります。作ったサイトの表示確認などに便利です。</p>
-
         <div class="paste">
-          <div class="paste-bar">
-            <span class="paste-label">貼り付ける</span>
-            <button class="copy-btn">コピー</button>
-          </div>
+          <div class="paste-bar"><span class="paste-label">貼り付ける</span><button class="copy-btn">コピー</button></div>
           <pre>Claude in Chrome（＝ClaudeがChromeを見て操作できる拡張機能）を使いたいです。
 私は Windows・非エンジニアです。インストールから使えるようになるまでを、
 「① どの画面の ② どこにある ③ 何と書いてあるボタンを ④ どうする」の形で、省略せずに教えてください。
 使えるようになったか確認する方法も教えてください。</pre>
         </div>
-      </section>
 
-      <!-- FINAL -->
-      <section class="step" id="final">
-        <div class="step-head">
-          <span class="step-num">CHECK</span>
-          <h2>できているか点検する<span class="time">最後に1回</span></h2>
-          <button class="check" data-step="7" aria-pressed="false"><span class="box"></span>完了</button>
-        </div>
+      </div></div></div>
+    </section>
+
+    <!-- FINAL -->
+    <section class="step" id="final">
+      <button class="step-head" aria-expanded="false" aria-controls="b7">
+        <span class="st-num">✔</span>
+        <span class="st-title">できているか点検する<small>最後に1回</small></span>
+        <span class="st-mark">
+          <svg class="st-check" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.2l3 3 6-6.4"/></svg>
+          <span class="chev"></span>
+        </span>
+      </button>
+      <div class="step-body" id="b7"><div><div class="body-in">
 
         <p class="lede">これを貼ると、Claude が全部まとめて点検して表で見せてくれます。</p>
-
         <div class="paste">
-          <div class="paste-bar">
-            <span class="paste-label">貼り付ける</span>
-            <button class="copy-btn">コピー</button>
-          </div>
+          <div class="paste-bar"><span class="paste-label">貼り付ける</span><button class="copy-btn">コピー</button></div>
           <pre>私の Claude Code のセットアップが正しくできているか点検して、表で見せてください。
 
 チェック項目
@@ -1199,104 +911,128 @@ STEP 4 で作った session-log スキルの保存先を、ローカルのファ
         </div>
 
         <h3>困ったときの一言集</h3>
-        <p>そのままコピーして使ってください。</p>
-
         <div class="tablewrap">
           <table>
             <thead><tr><th>こんなとき</th><th>言う言葉</th><th></th></tr></thead>
             <tbody>
-              <tr>
-                <td>説明が難しい</td>
-                <td data-phrase>いまの説明を、パソコンが苦手な人にも分かる言葉で言い直してください。専門用語には「（＝〇〇のこと）」を付けてください。</td>
-                <td><button class="mini-copy">コピー</button></td>
-              </tr>
-              <tr>
-                <td>どこを触るか分からない</td>
-                <td data-phrase>どの画面の・どこにある・何と書いてあるボタンを・どうするのか、①②③の順で省略せずに教えてください。</td>
-                <td><button class="mini-copy">コピー</button></td>
-              </tr>
-              <tr>
-                <td>勝手に大改造された</td>
-                <td data-phrase>頼んでいない変更が入っています。今回の依頼と無関係な変更を全部元に戻して、変更点の一覧を見せてください。</td>
-                <td><button class="mini-copy">コピー</button></td>
-              </tr>
-              <tr>
-                <td>本当に動くのか不安</td>
-                <td data-phrase>それは実際に動かして確認しましたか？確認していないなら「未確認」と正直に言って、確認する方法を教えてください。</td>
-                <td><button class="mini-copy">コピー</button></td>
-              </tr>
-              <tr>
-                <td>途中で話が飛んだ</td>
-                <td data-phrase>いまどこまで終わっていて、次に何をすればいいか、3行でまとめてください。</td>
-                <td><button class="mini-copy">コピー</button></td>
-              </tr>
+              <tr><td>説明が難しい</td><td data-phrase>いまの説明を、パソコンが苦手な人にも分かる言葉で言い直してください。専門用語には「（＝〇〇のこと）」を付けてください。</td><td><button class="mini-copy">コピー</button></td></tr>
+              <tr><td>どこを触るか分からない</td><td data-phrase>どの画面の・どこにある・何と書いてあるボタンを・どうするのか、①②③の順で省略せずに教えてください。</td><td><button class="mini-copy">コピー</button></td></tr>
+              <tr><td>勝手に大改造された</td><td data-phrase>頼んでいない変更が入っています。今回の依頼と無関係な変更を全部元に戻して、変更点の一覧を見せてください。</td><td><button class="mini-copy">コピー</button></td></tr>
+              <tr><td>本当に動くのか不安</td><td data-phrase>それは実際に動かして確認しましたか？確認していないなら「未確認」と正直に言って、確認する方法を教えてください。</td><td><button class="mini-copy">コピー</button></td></tr>
+              <tr><td>途中で話が飛んだ</td><td data-phrase>いまどこまで終わっていて、次に何をすればいいか、3行でまとめてください。</td><td><button class="mini-copy">コピー</button></td></tr>
             </tbody>
           </table>
         </div>
-      </section>
 
-      <div class="closing">
-        <p class="thesis">AI に<em>お願いする</em>のではなく、<em>仕組みで縛る</em>。</p>
-        <div class="recap">
-          <div><span>STEP 01</span><div>CLAUDE.md ＝ 毎回の説明をゼロにする</div></div>
-          <div><span>STEP 02</span><div>役割分業 ＝ 設計する人・手を動かす人・採点する人を分ける</div></div>
-          <div><span>STEP 03</span><div>フック ＝ ルールを「お願い」ではなく「強制」にする</div></div>
-          <div><span>STEP 04</span><div>スキル ＝ よく使う手順を合言葉ひとつにする</div></div>
-          <div><span>STEP 05</span><div>記録 ＝ 忘れてもいい状態をつくる</div></div>
-        </div>
-        <p class="colophon">うまくいくコツはこれだけです。STEP 1 と STEP 3 だけでも、AI との作業はかなり楽になります。<br>チェックの状態はこのブラウザに保存されるので、途中でページを閉じても続きから進められます。<br><br>作成：eri</p>
-      </div>
+      </div></div></div>
+    </section>
 
-    </main>
   </div>
+
+  <div class="closing">
+    <p class="thesis">AI に<em>お願いする</em>のではなく、<em>仕組みで縛る</em>。</p>
+    <div class="recap">
+      <div><span>STEP 01</span><div>CLAUDE.md ＝ 毎回の説明をゼロにする</div></div>
+      <div><span>STEP 02</span><div>役割分業 ＝ 設計する人・手を動かす人・採点する人を分ける</div></div>
+      <div><span>STEP 03</span><div>フック ＝ ルールを「お願い」ではなく「強制」にする</div></div>
+      <div><span>STEP 04</span><div>スキル ＝ よく使う手順を合言葉ひとつにする</div></div>
+      <div><span>STEP 05</span><div>記録 ＝ 忘れてもいい状態をつくる</div></div>
+    </div>
+    <p class="colophon">STEP 1 と STEP 3 だけでも、AI との作業はかなり楽になります。<br>進捗はこのブラウザに保存されるので、途中で閉じても続きから進められます。<br><br>作成：eri</p>
+  </div>
+
 </div>
 
 <script>
   (function () {
-    var KEY = 'cc-setup-progress-v1';
+    var KEY = 'cc-setup-progress-v2';
+    var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
+    var pbar = document.getElementById('pbar');
+    var pcount = document.getElementById('pcount');
+    var state = {};
 
-    function readState() {
-      try { return JSON.parse(localStorage.getItem(KEY) || '{}'); }
-      catch (e) { return {}; }
+    try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { state = {}; }
+    function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+    function renderProgress() {
+      var done = steps.filter(function (s) { return state[s.id]; }).length;
+      pbar.style.width = (done / steps.length * 100) + '%';
+      pcount.textContent = done + ' / ' + steps.length;
     }
-    function writeState(s) {
-      try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {}
+
+    function setOpen(step, open) {
+      step.classList.toggle('open', open);
+      step.querySelector('.step-head').setAttribute('aria-expanded', open ? 'true' : 'false');
     }
 
-    var state = readState();
-    var checks = Array.prototype.slice.call(document.querySelectorAll('.check'));
-    var railLinks = Array.prototype.slice.call(document.querySelectorAll('.rail a'));
-    var bar = document.getElementById('progress-bar');
-    var text = document.getElementById('progress-text');
-    var total = checks.length;
+    function openOnly(step) {
+      steps.forEach(function (s) { setOpen(s, s === step); });
+    }
 
-    function render() {
-      var done = 0;
-      checks.forEach(function (btn, i) {
-        var on = !!state[btn.dataset.step];
-        if (on) done++;
-        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-        btn.lastChild.nodeValue = on ? '完了ずみ' : '完了';
-        btn.closest('.step').classList.toggle('is-done', on);
-        if (railLinks[i]) railLinks[i].classList.toggle('done', on);
+    steps.forEach(function (step, i) {
+      var head = step.querySelector('.step-head');
+      var inner = step.querySelector('.body-in');
+
+      // 各ステップの最後に「完了！次へ」を足す
+      var foot = document.createElement('div');
+      foot.className = 'stepfoot';
+      var next = document.createElement('button');
+      next.className = 'next-btn';
+      next.innerHTML = (i === steps.length - 1 ? 'これで完成！' : '完了！次へ') + ' <span class="arw">→</span>';
+      var undo = document.createElement('button');
+      undo.className = 'undo-btn';
+      undo.textContent = 'まだ終わっていない';
+      foot.appendChild(next);
+      foot.appendChild(undo);
+      inner.appendChild(foot);
+
+      if (state[step.id]) step.classList.add('done');
+
+      head.addEventListener('click', function () {
+        var willOpen = !step.classList.contains('open');
+        if (willOpen) {
+          openOnly(step);
+          setTimeout(function () {
+            step.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 60);
+        } else {
+          setOpen(step, false);
+        }
       });
-      if (bar) bar.style.width = (done / total * 100) + '%';
-      if (text) text.textContent = done + ' / ' + total + ' 完了';
-    }
 
-    checks.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var k = btn.dataset.step;
-        if (state[k]) { delete state[k]; } else { state[k] = 1; }
-        writeState(state);
-        render();
+      next.addEventListener('click', function () {
+        state[step.id] = 1;
+        step.classList.add('done');
+        save();
+        renderProgress();
+        var target = steps[i + 1];
+        if (target) {
+          openOnly(target);
+          setTimeout(function () {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 60);
+        } else {
+          setOpen(step, false);
+        }
+      });
+
+      undo.addEventListener('click', function () {
+        delete state[step.id];
+        step.classList.remove('done');
+        save();
+        renderProgress();
       });
     });
 
-    render();
+    // 最初に開くのは「まだ終わっていない一番上のステップ」
+    var firstOpen = steps.filter(function (s) { return !state[s.id]; })[0] || steps[0];
+    setOpen(firstOpen, true);
+    renderProgress();
 
+    // ---------- コピー ----------
     function flash(btn, label) {
-      var original = btn.textContent;
+      var original = btn.dataset.label || btn.textContent;
+      btn.dataset.label = original;
       btn.textContent = label;
       btn.classList.add('copied');
       setTimeout(function () {
@@ -1305,14 +1041,17 @@ STEP 4 で作った session-log スキルの保存先を、ローカルのファ
       }, 1600);
     }
 
-    // 選択状態にしてから execCommand を試す。コピーに失敗しても選択は残るので、
-    // 利用者は Ctrl+C（Mac は ⌘+C）を押せば必ずコピーできる。
-    function selectAndCopy(node) {
+    function selectNode(node) {
       var sel = window.getSelection();
       var range = document.createRange();
       range.selectNodeContents(node);
       sel.removeAllRanges();
       sel.addRange(range);
+    }
+
+    // 選択してから execCommand。失敗しても選択は残るので Ctrl+C で拾える。
+    function selectAndCopy(node) {
+      selectNode(node);
       try { return document.execCommand('copy'); } catch (e) { return false; }
     }
 
@@ -1332,14 +1071,7 @@ STEP 4 で作った session-log スキルの保存先を、ローカルのファ
       var pre = box.querySelector('pre');
       var btn = box.querySelector('.copy-btn');
       btn.addEventListener('click', function () { copyFrom(pre, btn); });
-      // 枠の中をクリックしただけでも全選択される（ボタンが効かない環境の保険）
-      pre.addEventListener('click', function () {
-        var sel = window.getSelection();
-        var range = document.createRange();
-        range.selectNodeContents(pre);
-        sel.removeAllRanges();
-        sel.addRange(range);
-      });
+      pre.addEventListener('click', function () { selectNode(pre); });
     });
 
     document.querySelectorAll('.mini-copy').forEach(function (btn) {
