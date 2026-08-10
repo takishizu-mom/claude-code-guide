@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>貼り付け枠の色くらべ</title>
+<style>
+  :root{
+    --paper:#EFEDE6; --ink:#191919; --ink-3:#6B6862; --red:#C10000;
+    --hair-2:rgba(25,25,25,.14);
+    --mincho:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"Noto Serif JP",serif;
+    --gothic:"Hiragino Sans","Yu Gothic Medium","Yu Gothic","Noto Sans JP",Meiryo,system-ui,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--gothic);font-size:16px;line-height:1.74;letter-spacing:-.004em}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:9998;mix-blend-mode:multiply;opacity:.9;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='220' height='220' filter='url(%23f)' opacity='.34'/></svg>"),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='6'><circle cx='1' cy='1' r='.6' fill='%23191919' opacity='.10'/><circle cx='4' cy='4' r='.6' fill='%23191919' opacity='.07'/></svg>");
+    background-size:220px 220px,6px 6px}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 14px 70px;position:relative;z-index:1}
+  h1{font-family:var(--mincho);font-size:24px;font-weight:900;margin:0 0 6px;letter-spacing:-.02em}
+  .sub{color:var(--ink-3);font-size:13.5px;margin:0 0 26px}
+  .opt{margin:0 0 34px;border-top:3px solid var(--ink);padding-top:14px}
+  .opt h2{font-family:var(--mincho);font-size:19px;font-weight:900;margin:0 0 3px;letter-spacing:-.02em}
+  .opt h2 em{font-style:normal;color:var(--red);margin-right:.5em}
+  .opt .why{font-size:13.5px;color:var(--ink-3);margin:0 0 14px}
+
+  /* 見出しの黒帯（比較の基準） */
+  .sect{border:1px solid var(--ink);background:rgba(255,255,255,.34)}
+  .sect-head{display:flex;align-items:baseline;gap:10px;background:var(--ink);color:var(--paper);padding:9px 12px;margin:0;
+    font-family:var(--mincho);font-weight:900;font-size:17px;letter-spacing:-.02em}
+  .sect-head .n{font-family:var(--gothic);font-size:10px;letter-spacing:.12em;font-weight:700;
+    border:1px solid rgba(239,237,230,.55);padding:2px 7px;white-space:nowrap;flex:none}
+  .sect-body{padding:14px 14px 4px}
+
+  .clip{margin:0 0 8px}
+  .clip-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 7px 7px 11px}
+  .clip-label{font-size:10px;letter-spacing:.18em;font-weight:700}
+  .copy-btn{font-family:var(--gothic);font-size:10.5px;font-weight:700;letter-spacing:.1em;border:0;padding:6px 14px;cursor:pointer}
+  .clip pre{margin:0;padding:14px;font-family:var(--mono);font-size:12px;line-height:1.8;white-space:pre-wrap;overflow:auto;max-height:190px}
+  .clip-foot{padding:6px 12px;font-size:10.5px}
+
+  /* A：いまのまま（真っ黒） */
+  .a .clip{border:3px solid var(--ink);background:#191919}
+  .a .clip-bar{border-bottom:1px solid rgba(239,237,230,.25)}
+  .a .clip-label{color:var(--paper)}
+  .a .copy-btn{background:var(--red);color:#fff}
+  .a .clip pre{color:#EFEDE6}
+  .a .clip-foot{color:rgba(239,237,230,.62);border-top:1px solid rgba(239,237,230,.2)}
+
+  /* B：薄グレー地に黒文字（おすすめ） */
+  .b .clip{border:3px solid var(--ink);background:#D9D5CB}
+  .b .clip-bar{background:#C6C1B4;border-bottom:1px solid rgba(25,25,25,.25)}
+  .b .clip-label{color:var(--ink)}
+  .b .copy-btn{background:var(--red);color:#fff}
+  .b .clip pre{color:#1A1A1A}
+  .b .clip-foot{color:#57544D;border-top:1px solid rgba(25,25,25,.2)}
+
+  /* C：炭色（黒よりやや明るい） */
+  .c .clip{border:3px solid var(--ink);background:#3B3833}
+  .c .clip-bar{background:#2A2823;border-bottom:1px solid rgba(239,237,230,.2)}
+  .c .clip-label{color:var(--paper)}
+  .c .copy-btn{background:var(--red);color:#fff}
+  .c .clip pre{color:#EFEDE6}
+  .c .clip-foot{color:rgba(239,237,230,.6);border-top:1px solid rgba(239,237,230,.18)}
+
+  /* D：白地＋赤枠 */
+  .d .clip{border:3px solid var(--red);background:#FBFAF6}
+  .d .clip-bar{background:var(--red);border-bottom:0}
+  .d .clip-label{color:#fff}
+  .d .copy-btn{background:#fff;color:var(--red)}
+  .d .clip pre{color:#1A1A1A}
+  .d .clip-foot{color:#6B6862;border-top:1px solid rgba(25,25,25,.18)}
+
+  .note{border-top:3px solid var(--ink);padding-top:14px;font-size:13px;color:var(--ink-3)}
+</style>
+
+<div class="wrap">
+  <h1>貼り付け枠の色くらべ</h1>
+  <p class="sub">同じ中身を4パターンで並べました。上の「黒い見出し帯」との境目の見え方を比べてください。</p>
+
+  <section class="opt b">
+    <h2><em>B</em>薄いグレー地に黒文字 ── おすすめ</h2>
+    <p class="why">見出しの黒帯と明暗が逆になるので、境目が確実に立ちます。新聞の囲み記事らしさも一番出ます。</p>
+    <div class="sect">
+      <h3 class="sect-head"><span class="n">3-1</span>安全装置をつくらせる</h3>
+      <div class="sect-body">
+        <div class="clip">
+          <div class="clip-bar"><span class="clip-label">貼り付ける 1/2</span><button class="copy-btn">コピー</button></div>
+          <pre>Claude Code のフック（＝操作の直前に自動で走る見張り番）を設定してください。
+私のパソコンは Windows です。Git for Windows は入れてあります。
+
+【つくってほしい仕組み】
+A. 本体セッションのモデルが opus のとき、Edit と Write をブロックする。
+   ただし次は例外として許可する：
+   - .md / .txt などの文書ファイル
+   - .claude フォルダの中のファイル</pre>
+          <div class="clip-foot">終わったら、バックアップの置き場所をメモしておいてください</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="opt c">
+    <h2><em>C</em>炭色（黒よりすこし明るい）</h2>
+    <p class="why">今の雰囲気を保ったまま、見出しの黒との差をつけます。差は小さめなので、明るい所で見ると分かりにくいかもしれません。</p>
+    <div class="sect">
+      <h3 class="sect-head"><span class="n">3-1</span>安全装置をつくらせる</h3>
+      <div class="sect-body">
+        <div class="clip">
+          <div class="clip-bar"><span class="clip-label">貼り付ける 1/2</span><button class="copy-btn">コピー</button></div>
+          <pre>Claude Code のフック（＝操作の直前に自動で走る見張り番）を設定してください。
+私のパソコンは Windows です。Git for Windows は入れてあります。
+
+【つくってほしい仕組み】
+A. 本体セッションのモデルが opus のとき、Edit と Write をブロックする。
+   ただし次は例外として許可する：
+   - .md / .txt などの文書ファイル
+   - .claude フォルダの中のファイル</pre>
+          <div class="clip-foot">終わったら、バックアップの置き場所をメモしておいてください</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="opt d">
+    <h2><em>D</em>白地に赤枠</h2>
+    <p class="why">貼る場所が一番目立ちます。ただし赤が増えるので、紙面全体がにぎやかになります。</p>
+    <div class="sect">
+      <h3 class="sect-head"><span class="n">3-1</span>安全装置をつくらせる</h3>
+      <div class="sect-body">
+        <div class="clip">
+          <div class="clip-bar"><span class="clip-label">貼り付ける 1/2</span><button class="copy-btn">コピー</button></div>
+          <pre>Claude Code のフック（＝操作の直前に自動で走る見張り番）を設定してください。
+私のパソコンは Windows です。Git for Windows は入れてあります。
+
+【つくってほしい仕組み】
+A. 本体セッションのモデルが opus のとき、Edit と Write をブロックする。
+   ただし次は例外として許可する：
+   - .md / .txt などの文書ファイル
+   - .claude フォルダの中のファイル</pre>
+          <div class="clip-foot">終わったら、バックアップの置き場所をメモしておいてください</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="opt a">
+    <h2><em>A</em>いまのまま（真っ黒）</h2>
+    <p class="why">比較用です。見出しの黒帯と同じ色なので、境目が消えています。</p>
+    <div class="sect">
+      <h3 class="sect-head"><span class="n">3-1</span>安全装置をつくらせる</h3>
+      <div class="sect-body">
+        <div class="clip">
+          <div class="clip-bar"><span class="clip-label">貼り付ける 1/2</span><button class="copy-btn">コピー</button></div>
+          <pre>Claude Code のフック（＝操作の直前に自動で走る見張り番）を設定してください。
+私のパソコンは Windows です。Git for Windows は入れてあります。
+
+【つくってほしい仕組み】
+A. 本体セッションのモデルが opus のとき、Edit と Write をブロックする。
+   ただし次は例外として許可する：
+   - .md / .txt などの文書ファイル
+   - .claude フォルダの中のファイル</pre>
+          <div class="clip-foot">終わったら、バックアップの置き場所をメモしておいてください</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="note">気に入ったものの記号（B・C・D）を教えてください。全15か所の貼り付け枠をまとめて差し替えます。</p>
+</div>
+
+</body>
+</html>
