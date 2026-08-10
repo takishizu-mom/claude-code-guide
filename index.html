@@ -168,7 +168,7 @@
   .imprint .big { font-family: var(--fraktur); font-size: 20px; color: var(--ink-2); letter-spacing: 0; }
 
   /* 記事 */
-  .article { border-top: 1px solid var(--ink); scroll-margin-top: 50px; }
+  .article { border-top: 1px solid var(--ink); scroll-margin-top: 52px; }
   .article:last-of-type { border-bottom: 3px solid var(--ink); }
   .art-head {
     width: 100%; display: grid; grid-template-columns: 58px 1fr 20px; gap: 12px;
@@ -1250,20 +1250,44 @@ STEP 4 で作った session-log スキルの保存先を、ローカルのファ
     }
     function openOnly(a) { arts.forEach(function (x) { setOpen(x, x === a); }); }
 
+    // 見出しが上の帯のすぐ下に来る位置まで運ぶ
+    function scrollToArt(art) {
+      var bar = document.querySelector('.progress');
+      var off = (bar ? bar.offsetHeight : 0) + 6;
+      var y = art.getBoundingClientRect().top + window.pageYOffset - off;
+      window.scrollTo({ top: y < 0 ? 0 : y, behavior: 'smooth' });
+    }
+
+    // 上の記事が閉じ終わってから位置を測る（途中で測ると見出しが画面の上に消える）
+    function openAndScroll(art) {
+      var closing = document.querySelector('.article.open');
+      openOnly(art);
+      if (closing && closing !== art) {
+        var body = closing.querySelector('.art-body');
+        var fired = false;
+        var fire = function () {
+          if (fired) return;
+          fired = true;
+          body.removeEventListener('transitionend', fire);
+          scrollToArt(art);
+        };
+        body.addEventListener('transitionend', fire);
+        setTimeout(fire, 480);
+      } else {
+        requestAnimationFrame(function () { scrollToArt(art); });
+      }
+    }
+
     arts.forEach(function (art, i) {
       art.querySelector('.art-head').addEventListener('click', function () {
         if (art.classList.contains('open')) { setOpen(art, false); return; }
-        openOnly(art);
-        setTimeout(function () { art.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+        openAndScroll(art);
       });
 
       art.querySelector('.next-btn').addEventListener('click', function () {
         state[art.id] = 1; save(); render();
         var nx = arts[i + 1];
-        if (nx) {
-          openOnly(nx);
-          setTimeout(function () { nx.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
-        } else { setOpen(art, false); }
+        if (nx) { openAndScroll(nx); } else { setOpen(art, false); }
       });
 
       art.querySelector('.undo-btn').addEventListener('click', function () {
@@ -1278,8 +1302,7 @@ STEP 4 で作った session-log スキルの保存先を、ローカルのファ
         var art = document.getElementById(id);
         if (!art) return;
         e.preventDefault();
-        openOnly(art);
-        setTimeout(function () { art.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+        openAndScroll(art);
       });
     });
 
