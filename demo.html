@@ -318,16 +318,48 @@
   .verify b { font-size: 10px; letter-spacing: .2em; color: var(--ink-3); display: block; margin-bottom: 4px; }
   .verify p { margin: 0; font-size: 15px; }
 
-  .art-foot { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--hair-2); }
+  /* 記事の終わり＝切り取り線＋大きな受付ボタン */
+  .art-foot {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px dashed var(--ink);
+    display: grid;
+    gap: 10px;
+  }
+  .foot-label {
+    font-size: 10.5px; letter-spacing: .2em; color: var(--ink-3);
+    text-align: center; margin: 0 0 2px;
+  }
   .next-btn {
-    font-family: var(--gothic); font-size: 14px; font-weight: 800; letter-spacing: .04em;
-    background: var(--ink); color: var(--paper); border: 0; padding: 12px 22px; cursor: pointer;
+    font-family: var(--gothic); font-size: 17px; font-weight: 800; letter-spacing: .04em;
+    background: var(--red); color: #fff;
+    border: 2px solid var(--ink);
+    padding: 17px 20px; cursor: pointer; width: 100%;
+    box-shadow: 6px 6px 0 var(--ink);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: transform .08s, box-shadow .08s;
   }
-  .next-btn:hover { background: var(--red); }
+  .next-btn .mark {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border: 2px solid #fff; font-size: 14px; flex: none;
+  }
+  .next-btn:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
   .undo-btn {
-    font-family: var(--gothic); font-size: 11.5px; font-weight: 700;
-    background: none; border: 1px solid var(--hair); color: var(--ink-3); padding: 11px 13px; cursor: pointer;
+    font-family: var(--gothic); font-size: 13px; font-weight: 700;
+    background: none; border: 1px solid var(--hair); color: var(--ink-3);
+    padding: 13px; cursor: pointer; width: 100%;
   }
+  .undo-btn:hover { border-color: var(--ink); color: var(--ink); }
+  /* 完了した記事の見え方 */
+  .article.done .art-title { color: var(--ink-3); }
+  .stamp {
+    display: none;
+    font-size: 10px; font-weight: 800; letter-spacing: .18em;
+    border: 2px solid var(--red); color: var(--red);
+    padding: 2px 8px; transform: rotate(-4deg); white-space: nowrap;
+    margin-top: 6px;
+  }
+  .article.done .stamp { display: inline-block; }
 
   .demo-note { margin-top: 34px; padding-top: 14px; border-top: 3px solid var(--ink); font-size: 12.5px; color: var(--ink-3); line-height: 1.9; }
 
@@ -495,8 +527,9 @@
       </section>
 
       <div class="art-foot">
-        <button class="next-btn">完了、次へ</button>
-        <button class="undo-btn">まだ終わっていない</button>
+        <p class="foot-label">── ここまで終わったら ──</p>
+        <button class="next-btn"><span class="mark">✓</span>完了、次の記事へ</button>
+        <button class="undo-btn">まだ終わっていない（あとで戻る）</button>
       </div>
 
     </div></div></div>
@@ -524,7 +557,8 @@
       <span class="art-title">
         <span class="art-kicker">第三報</span>
         <span class="chunk">担当者を三人つくる</span>
-        <span class="art-meta">サブエージェント ／ 約 10 分 ・ 完了</span>
+        <span class="art-meta">サブエージェント ／ 約 10 分</span>
+        <span class="stamp">済</span>
       </span>
       <span class="art-sign">＋</span>
     </button>
